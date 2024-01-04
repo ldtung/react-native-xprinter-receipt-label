@@ -8,13 +8,13 @@ type BluetoothPrinter = {
 type NativeModuleType = typeof NativeModules & {
   RNXprinter: {
     printTcp80mm(
-      payload: string,
       ip: string,
       port: number,
+      payload: string,
     ): Promise<void>;
     printBluetooth(
-      payload: string,
       macAddress: string,
+      payload: string,
     ): Promise<void>;
     getBluetoothDeviceList(): Promise<BluetoothPrinter[]>;
   };
@@ -37,10 +37,10 @@ interface PrintBluetoothInterface extends PrinterInterface {
 }
 
 let defaultConfig: PrintTcpInterface & PrintBluetoothInterface = {
-  payload: '',
   macAddress: '',
   ip: '192.168.192.168',
   port: 9100,
+  payload: '',
 };
 
 const getConfig = (
@@ -53,15 +53,15 @@ const printTcp80mm = async (
   args: Partial<PrintTcpInterface> & Pick<PrinterInterface, 'payload'>
 ): Promise<void> => {
   const {
-    payload,
     ip,
     port,
+    payload,
   } = getConfig(args);
 
   await RNXprinter.printTcp80mm(
-    payload,
     ip,
     port,
+    payload,
     );
   };
 
@@ -69,13 +69,13 @@ const printBluetooth = (
   args: Partial<PrintBluetoothInterface> & Pick<PrinterInterface, 'payload'>
 ): Promise<void> => {
   const {
-    payload,
     macAddress,
+    payload,
   } = getConfig(args);
 
   return RNXprinter.printBluetooth(
-    payload,
     macAddress,
+    payload,
   );
 };
 
