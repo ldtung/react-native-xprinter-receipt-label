@@ -1,18 +1,27 @@
 {
   "compilerOptions": {
-    "declaration": true,
+    "baseUrl": "./",
+    "paths": {
+      "react-native-xprinter-receipt-label": ["./src/index"]
+    },
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
     "esModuleInterop": true,
+    "importsNotUsedAsValues": "error",
+    "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "lib": ["ESNext"],
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "noEmitOnError": true,
-    "outDir": "./lib",
+    "lib": ["esnext"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitUseStrict": false,
+    "noStrictGenericChecks": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
-    "sourceMap": true,
     "strict": true,
-    "target": "ES2018",
-  },
-  "exclude": ["**/__tests__/*"],
-  "include": ["src"]
+    "target": "esnext"
+  }
 }
