@@ -184,7 +184,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     // initialize the printer
                     list.add(DataForSendToPrinterPos80.initializePrinter());
                     list.add(DataForSendToPrinterPos80.CancelChineseCharModel());
-                    list.add(DataForSendToPrinterPos80.selectCharacterCodePage(27));
+                    list.add(DataForSendToPrinterPos80.selectCharacterCodePage(2));
                     DataForSendToPrinterPos80.setCharsetName("utf-8");
                     byte[] textBytesToPrint = StringUtils.strTobytes(str, "utf-8");
                     list.add(PrinterCommands.ESC_ALIGN_CENTER);
