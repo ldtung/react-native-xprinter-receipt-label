@@ -27,6 +27,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.analy.receiptlabel.utils.PrinterCommands;
 import com.analy.receiptlabel.utils.StringUtils;
+import com.facebook.react.module.annotations.ReactModule;
 import com.zxy.tiny.Tiny;
 import com.zxy.tiny.callback.BitmapCallback;
 
@@ -40,7 +41,7 @@ import net.posprinter.utils.DataForSendToPrinterPos80;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
+@ReactModule(name = XprinterModule.NAME)
 public class XprinterModule extends ReactContextBaseJavaModule {
   public static String DISCONNECT = "com.posconsend.net.disconnetct";
   public static final String NAME = "RNXprinter";
@@ -145,7 +146,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void printTcp80mm(String payload, String ipAddress, int port, final Promise promise) {
+  public void printTcp80mm(String ipAddress, int port, String payload, final Promise promise) {
     if (StringUtils.isBlank(ipAddress) || port <= 0) {
       promise.reject("-1", "Should provide valid ip address");
       return;
