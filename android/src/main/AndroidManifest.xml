@@ -1,5 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.wiicamp.reactnativexprinter">
-  <uses-permission android:name="android.permission.BLUETOOTH" />
-  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    package="com.tamnguyen.receiptlabel">
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <application>
+        <service android:name="net.posprinter.service.PosprinterService" />
+    </application>
 </manifest>
