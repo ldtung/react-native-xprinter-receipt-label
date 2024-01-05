@@ -1,2 +1,11 @@
 include ':printer_libs'
-project(':printer_libs').projectDir = new File(rootProject.projectDir, 'printer_libs')
+// Get the environment variable indicating React Native context
+def isReactNative = System.getenv().containsKey("REACT_NATIVE_ROOT")
+
+if (isReactNative) {
+    // Use a different path if building from React Native
+    project(':printer_libs').projectDir = new File(rootProject.projectDir, '/android/printer_libs')
+} else {
+    // Use the default path for Android Studio build
+    project(':printer_libs').projectDir = new File(rootProject.projectDir, 'printer_libs')
+}
