@@ -4,7 +4,7 @@ def isReactNative = System.getenv().containsKey("REACT_NATIVE_ROOT")
 
 if (isReactNative) {
     // Use a different path if building from React Native
-    project(':printer_libs').projectDir = new File(rootProject.projectDir, '/android/printer_libs')
+    project(':printer_libs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-xprinter-receipt-label/android/printer_libs')
 } else {
     // Use the default path for Android Studio build
     project(':printer_libs').projectDir = new File(rootProject.projectDir, 'printer_libs')
