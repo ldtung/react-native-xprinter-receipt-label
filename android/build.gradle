@@ -1,6 +1,7 @@
 buildscript {
     if (project == rootProject) {
         repositories {
+            mavenLocal()
             google()
             jcenter()
         }
@@ -43,6 +44,7 @@ android {
 
 repositories {
     mavenLocal()
+    maven { url uri("~/.m2/repository") }
     maven {
         // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
         url("$rootDir/../node_modules/react-native/android")
@@ -52,15 +54,10 @@ repositories {
     maven { url 'https://www.jitpack.io' }
 }
 
-repositories {
-    flatDir {
-        dirs 'printer_libs'
-    }
-}
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
     implementation files('libs_sdk/posprinterconnectandsendsdk.jar')
     implementation files('libs_sdk/tiny.jar')
-    implementation(name: 'printer-lib-2.2.4', ext: 'aar')
+    implementation 'com.analy.xprinter-lib:xprinter-lib:1.0.0'
 }
