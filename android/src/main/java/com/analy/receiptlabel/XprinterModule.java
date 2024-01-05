@@ -28,8 +28,6 @@ import com.facebook.react.bridge.WritableMap;
 import com.analy.receiptlabel.utils.PrinterCommands;
 import com.analy.receiptlabel.utils.StringUtils;
 import com.facebook.react.module.annotations.ReactModule;
-import com.zxy.tiny.Tiny;
-import com.zxy.tiny.callback.BitmapCallback;
 
 import net.posprinter.IDeviceConnection;
 import net.posprinter.IPOSListener;
