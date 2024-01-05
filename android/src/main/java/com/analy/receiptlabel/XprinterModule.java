@@ -31,6 +31,10 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.zxy.tiny.Tiny;
 import com.zxy.tiny.callback.BitmapCallback;
 
+import net.posprinter.IDeviceConnection;
+import net.posprinter.IPOSListener;
+import net.posprinter.POSConnect;
+import net.posprinter.POSPrinter;
 import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.posprinterface.ProcessData;
 import net.posprinter.posprinterface.UiExecute;
@@ -41,6 +45,7 @@ import net.posprinter.utils.DataForSendToPrinterPos80;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 @ReactModule(name = XprinterModule.NAME)
 public class XprinterModule extends ReactContextBaseJavaModule {
   public static String DISCONNECT = "com.posconsend.net.disconnetct";
@@ -218,6 +223,33 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         promise.reject("-105", "Device not connect.");
       }
     });
+
+
+    IPOSListener connectListener = new IPOSListener() {
+      @Override
+      public void onStatus(int code, String s) {
+        switch (code) {
+          case POSConnect.CONNECT_SUCCESS: {
+            break;
+          }
+          case POSConnect.CONNECT_FAIL: {
+            break;
+          }
+        }
+      }
+    };
+
+    // Try to print with new libs
+    POSConnect.init(this.context);
+    IDeviceConnection curConnect = null;
+    curConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+    curConnect.connect(ipAddress, connectListener);
+    POSPrinter printer = new POSPrinter(curConnect);
+    printer.initializePrinter();
+    printer.printString(payload)
+            .feedLine()
+            .cutHalfAndFeed(1);
+    curConnect.close();
   }
 
   @ReactMethod

@@ -57,5 +57,6 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
     implementation files('libs_sdk/posprinterconnectandsendsdk.jar')
-    implementation files('libs_sdk/tiny.jar')  // From node_modules
+    implementation files('libs_sdk/tiny.jar')
+    api project(':printer_libs')
 }
