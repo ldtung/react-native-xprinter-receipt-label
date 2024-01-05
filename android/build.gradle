@@ -57,5 +57,5 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation files('libs_sdk/posprinterconnectandsendsdk.jar')
     implementation files('libs_sdk/tiny.jar')
-    implementation project(path: ':printer_libs')
+    implementation files('printer_libs/printer-lib-2.2.4.aar')
 }
