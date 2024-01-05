@@ -1,2 +1,2 @@
 include ':printer_libs'
-project(':printer_libs').projectDir = new File(rootProject.projectDir, '/printer_libs')
+project(':printer_libs').projectDir = new File(rootProject.projectDir, 'printer_libs')
