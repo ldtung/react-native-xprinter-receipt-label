@@ -115,16 +115,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
           case POSConnect.CONNECT_SUCCESS: {
             POSPrinter printer = new POSPrinter(curConnect);
             printer.initializePrinter();
-            List<Integer> codepages = Arrays.asList(27, 28, 29, 30, 31, 94);
-            for (Integer codepage : codepages) {
-              try {
-                printer.selectCodePage(codepage);
-                printer.setCharSet("utf-8");
-                printer.printString(codepage + "@@@" + payload);
-              } catch (Exception ex) {
-
-              }
-            }
+            printer.setCharSet("utf-8");
+            printer.printString(payload);
             printer.feedLine();
             printer.cutHalfAndFeed(1);
             curConnect.close();
