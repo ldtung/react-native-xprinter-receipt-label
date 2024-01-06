@@ -121,8 +121,12 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
                     81, 82, 83, 84, 85, 86, 87, 88, 89);
             for (Integer codepage : codepages) {
-              printer.selectCodePage(codepage);
-              printer.printString(codepage+ "@@@" + payload);
+              try {
+                printer.selectCodePage(codepage);
+                printer.printString(codepage + "@@@" + payload);
+              } catch (Exception ex) {
+
+              }
             }
             printer.feedLine();
             printer.cutHalfAndFeed(1);
