@@ -28,6 +28,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.analy.receiptlabel.utils.PrinterCommands;
 import com.analy.receiptlabel.utils.StringUtils;
 import com.facebook.react.module.annotations.ReactModule;
+import com.tinyhack.vncharset.VNCharsetProvider;
 import com.zxy.tiny.Tiny;
 import com.zxy.tiny.callback.BitmapCallback;
 
@@ -38,6 +39,7 @@ import net.posprinter.service.PosprinterService;
 import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos80;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -186,20 +188,34 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     // initialize the printer
                     list.add(DataForSendToPrinterPos80.initializePrinter());
                     list.add(DataForSendToPrinterPos80.CancelChineseCharModel());
-                    List<Integer> codepages = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8 ,9, 10, 16, 17, 18, 19, 20,
-                            21,22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 255, 33, 50, 51, 52, 53,
-                            54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
-                            71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
-                            81, 82, 83, 84, 85, 86, 87, 88, 89);
-                    Collections.reverse(codepages);
-                    for (Integer codepage  : codepages) {
-                      list.add(DataForSendToPrinterPos80.selectCharacterCodePage(codepage));
-                      DataForSendToPrinterPos80.setCharsetName("utf-8");
-                      byte[] textBytesToPrint = StringUtils.strTobytes(codepage + "@@@" + str, "utf-8");
-                      list.add(PrinterCommands.ESC_ALIGN_CENTER);
-                      list.add(DataForSendToPrinterPos80.selectCharacterSize(characterSize));
-                      list.add(textBytesToPrint);
-                    }
+//                    List<Integer> codepages = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8 ,9, 10, 16, 17, 18, 19, 20,
+//                            21,22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 255, 33, 50, 51, 52, 53,
+//                            54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
+//                            71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
+//                            81, 82, 83, 84, 85, 86, 87, 88, 89);
+//                    Collections.reverse(codepages);
+//                    for (Integer codepage  : codepages) {
+                    list.add(DataForSendToPrinterPos80.selectCharacterCodePage(27));
+                    Charset charsetObj = new VNCharsetProvider().charsetForName("TCVN-3-1");
+                    byte[] textBytesToPrint = str.getBytes(charsetObj);
+                    list.add(PrinterCommands.ESC_ALIGN_CENTER);
+                    list.add(DataForSendToPrinterPos80.selectCharacterSize(characterSize));
+                    list.add(textBytesToPrint);
+
+                    list.add(DataForSendToPrinterPos80.selectCharacterCodePage(27));
+                    charsetObj = new VNCharsetProvider().charsetForName("TCVN-3-2");
+                    textBytesToPrint = str.getBytes(charsetObj);
+                    list.add(PrinterCommands.ESC_ALIGN_CENTER);
+                    list.add(DataForSendToPrinterPos80.selectCharacterSize(characterSize));
+                    list.add(textBytesToPrint);
+
+                    list.add(DataForSendToPrinterPos80.selectCharacterCodePage(27));
+                    textBytesToPrint = StringUtils.strTobytes(str, "windows-1258");
+
+                    list.add(PrinterCommands.ESC_ALIGN_CENTER);
+                    list.add(DataForSendToPrinterPos80.selectCharacterSize(characterSize));
+                    list.add(textBytesToPrint);
+//                    }
 
                     // should add the command of print and feed line,because print only when one
                     // line is complete, not one line, no print

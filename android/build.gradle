@@ -58,4 +58,5 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation files('libs_sdk/posprinterconnectandsendsdk.jar')
     implementation files('libs_sdk/tiny.jar')  // From node_modules
+    implementation files('libs_sdk/TCVN-3.jar')
 }
