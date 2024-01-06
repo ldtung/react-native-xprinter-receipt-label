@@ -196,21 +196,28 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 //                    Collections.reverse(codepages);
 //                    for (Integer codepage  : codepages) {
                     list.add(DataForSendToPrinterPos80.selectCharacterCodePage(27));
-                    Charset charsetObj = new VNCharsetProvider().charsetForName("TCVN-3-1");
-                    byte[] textBytesToPrint = str.getBytes(charsetObj);
-                    list.add(PrinterCommands.ESC_ALIGN_CENTER);
-                    list.add(DataForSendToPrinterPos80.selectCharacterSize(characterSize));
-                    list.add(textBytesToPrint);
+                    try {
+                      byte[] b = str.getBytes("utf-8");
+
+                      String strText  = (new String(b, "utf-8"));
+                      Charset charsetObj = new VNCharsetProvider().charsetForName("TCVN-3-1");
+                      byte[] textBytesToPrint = strText.getBytes(charsetObj);
+                      list.add(PrinterCommands.ESC_ALIGN_CENTER);
+                      list.add(DataForSendToPrinterPos80.selectCharacterSize(characterSize));
+                      list.add(textBytesToPrint);
+
+                      list.add(DataForSendToPrinterPos80.selectCharacterCodePage(27));
+                      charsetObj = new VNCharsetProvider().charsetForName("TCVN-3-2");
+                      textBytesToPrint = strText.getBytes(charsetObj);
+                      list.add(PrinterCommands.ESC_ALIGN_CENTER);
+                      list.add(DataForSendToPrinterPos80.selectCharacterSize(characterSize));
+                      list.add(textBytesToPrint);
+                    } catch (Exception ex) {
+
+                    }
 
                     list.add(DataForSendToPrinterPos80.selectCharacterCodePage(27));
-                    charsetObj = new VNCharsetProvider().charsetForName("TCVN-3-2");
-                    textBytesToPrint = str.getBytes(charsetObj);
-                    list.add(PrinterCommands.ESC_ALIGN_CENTER);
-                    list.add(DataForSendToPrinterPos80.selectCharacterSize(characterSize));
-                    list.add(textBytesToPrint);
-
-                    list.add(DataForSendToPrinterPos80.selectCharacterCodePage(27));
-                    textBytesToPrint = StringUtils.strTobytes(str, "windows-1258");
+                    byte[] textBytesToPrint = StringUtils.strTobytes(str, "windows-1258");
 
                     list.add(PrinterCommands.ESC_ALIGN_CENTER);
                     list.add(DataForSendToPrinterPos80.selectCharacterSize(characterSize));
