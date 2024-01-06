@@ -59,6 +59,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
   BluetoothAdapter bluetoothAdapter;
   private Set<BluetoothDevice> mPairedDevices;
 
+  private IDeviceConnection curConnect = null;
+
   // bindService connection
   ServiceConnection conn = new ServiceConnection() {
     @Override
@@ -101,12 +103,21 @@ public class XprinterModule extends ReactContextBaseJavaModule {
       return;
     }
     int characterSize = 16;
+    // Try to print with new libs
+    POSConnect.init(this.context);
 
+    curConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
     IPOSListener connectListener = new IPOSListener() {
       @Override
       public void onStatus(int code, String s) {
         switch (code) {
           case POSConnect.CONNECT_SUCCESS: {
+            POSPrinter printer = new POSPrinter(curConnect);
+            printer.initializePrinter();
+            printer.printString(payload)
+                    .feedLine()
+                    .cutHalfAndFeed(1);
+            curConnect.close();
             break;
           }
           case POSConnect.CONNECT_FAIL: {
@@ -115,17 +126,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
       }
     };
-
-    // Try to print with new libs
-    POSConnect.init(this.context);
-    IDeviceConnection curConnect = null;
-    curConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
     curConnect.connect(ipAddress, connectListener);
-    POSPrinter printer = new POSPrinter(curConnect);
-    printer.initializePrinter();
-    printer.printString(payload)
-            .feedLine()
-            .cutHalfAndFeed(1);
-    curConnect.close();
+
   }
 }
