@@ -41,6 +41,7 @@ import net.posprinter.utils.BitmapToByteData;
 import net.posprinter.utils.DataForSendToPrinterPos80;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -114,9 +115,17 @@ public class XprinterModule extends ReactContextBaseJavaModule {
           case POSConnect.CONNECT_SUCCESS: {
             POSPrinter printer = new POSPrinter(curConnect);
             printer.initializePrinter();
-            printer.printString(payload)
-                    .feedLine()
-                    .cutHalfAndFeed(1);
+            List<Integer> codepages = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8 ,9, 10, 16, 17, 18, 19, 20,
+                    21,22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 255, 33, 50, 51, 52, 53,
+                    54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
+                    71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
+                    81, 82, 83, 84, 85, 86, 87, 88, 89);
+            for (Integer codepage : codepages) {
+              printer.selectCodePage(codepage);
+              printer.printString(codepage+ "@@@" + payload);
+            }
+            printer.feedLine();
+            printer.cutHalfAndFeed(1);
             curConnect.close();
             break;
           }
