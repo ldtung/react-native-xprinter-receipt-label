@@ -66,4 +66,5 @@ dependencies {
 //    implementation files('libs_sdk/posprinterconnectandsendsdk.jar')
 //    implementation files('libs_sdk/tiny.jar')
     implementation 'com.analy.xprinter-lib:xprinter-lib:1.0.0'
+    implementation 'com.github.danielfelgar:draw-receipt:0.1.3'
 }
