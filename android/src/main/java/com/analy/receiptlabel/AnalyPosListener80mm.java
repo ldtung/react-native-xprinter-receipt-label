@@ -45,7 +45,7 @@ public class AnalyPosListener80mm implements IPOSListener {
                             receipt.addLine();
                             continue;
                         }
-                        //receipt.setTypeface(this.context, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
+                        receipt.setTypeface(this.context, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
                         receipt.setTextSize(line.textSize != null ? line.textSize : defaultTextSize);
                         receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
                         receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
