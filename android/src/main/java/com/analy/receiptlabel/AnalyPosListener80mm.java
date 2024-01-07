@@ -38,20 +38,22 @@ public class AnalyPosListener80mm implements IPOSListener {
                 try {
                     POSPrinter printer = new POSPrinter(curConnect);
                     printer.initializePrinter();
-                    ReceiptBuilder receipt = new ReceiptBuilder(receiptWidth);
+                    ReceiptBuilder receipt = new ReceiptBuilder(1200);
                     receipt.setMargin(2, 2);
-                    for (PrinterLine line : lines) {
-                        if (line.isNewLine) {
-                            receipt.addLine();
-                            continue;
-                        }
-                        //receipt.setTypeface(this.context, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
-                        receipt.setTextSize(line.textSize != null ? line.textSize : defaultTextSize);
-                        receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
-                        receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
-                        receipt.addText(line.text, line.isNewLine);
-                    }
-
+//                    for (PrinterLine line : lines) {
+//                        if (line.isNewLine) {
+//                            receipt.addLine();
+//                            continue;
+//                        }
+//                        receipt.setTypeface(this.context, line.isBold ? "font/RobotoMono-Bold.ttf" : "font/RobotoMono-Regular.ttf");
+//                        receipt.setTextSize(line.textSize != null ? line.textSize : defaultTextSize);
+//                        receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
+//                        receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
+//                        receipt.addText(line.text, line.isNewLine);
+//                    }
+                    receipt.setTextSize(90F);
+                    receipt.addText("Bún mắm nêm bún nem nướng Tôi yêu tổ quốc tôi lắm.");
+                    receipt.addText("Đây là nắng nem nướng nha trang à ứ ừ ư ự!");
                     printer.printBitmap(receipt.build(), POSConst.ALIGNMENT_CENTER, receiptWidth);
                     printer.feedLine();
                     printer.cutHalfAndFeed(1);
