@@ -99,7 +99,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 
     private List<PrinterLine> parsePayload(String payload) {
         List<PrinterLine> lines = new ArrayList<>();
-        String[] payloadItems = payload.split("\\r\\n");
+        String[] payloadItems = payload.split("@@NL@@");
         for (String payloadLine : payloadItems) {
             List<String> inlineStrings = splitString(payloadLine);
             for (String inlineText : inlineStrings) {
