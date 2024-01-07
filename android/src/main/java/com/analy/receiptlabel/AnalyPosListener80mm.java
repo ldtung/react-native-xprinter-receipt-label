@@ -42,6 +42,9 @@ public class AnalyPosListener80mm implements IPOSListener {
                         printer.printString("Đây là nắng nem nướng nha trang");
                         ReceiptBuilder receipt = new ReceiptBuilder(1200);
                         receipt.setMargin(2, 2);
+                        receipt.setAlign(Paint.Align.LEFT);
+                        receipt.setColor(Color.BLACK);
+                        receipt.setTextSize(90F);
                         printer.printString("Tới đây 1");
                         for (PrinterLine line : lines) {
                             if (line.isNewLine) {
@@ -57,6 +60,7 @@ public class AnalyPosListener80mm implements IPOSListener {
                             printer.printString("Tới đây 3 " + "- " + line.text);
                         }
                         printer.printString("Tới đây 4");
+                        printer.feedLine(2);
 
                         printer.printBitmap(receipt.build(), POSConst.ALIGNMENT_CENTER, receiptWidth);
                     } catch (Exception ex) {
