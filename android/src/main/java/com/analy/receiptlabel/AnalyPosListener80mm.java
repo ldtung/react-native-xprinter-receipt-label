@@ -62,7 +62,7 @@ public class AnalyPosListener80mm implements IPOSListener {
                         printer.printString("Tới đây 4");
                         printer.feedLine(2);
 
-                        printer.printBitmap(receipt.build(), POSConst.ALIGNMENT_CENTER, receiptWidth);
+                        printer.printBitmap(receipt.build(), POSConst.ALIGNMENT_CENTER, 484);
                     } catch (Exception ex) {
                         printer.printString("Tới đây 5" + ex.getMessage());
                     }
