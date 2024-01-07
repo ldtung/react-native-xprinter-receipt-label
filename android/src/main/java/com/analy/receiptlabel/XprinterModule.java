@@ -71,8 +71,6 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         this.context.bindService(intent, conn, BIND_AUTO_CREATE);
         Log.v(NAME, "RNXNetprinter alloc");
 
-        // Try to print with new libs
-        POSConnect.init(this.context);
     }
 
     @Override
@@ -90,7 +88,10 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             promise.reject("-1", "Should provide valid pageLoad to print");
             return;
         }
+
         List<PrinterLine> lines = parsePayload(payload);
+        // Try to print with new libs
+        POSConnect.init(this.context);
         curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
         curEthernetConnect.connect(ipAddress, new AnalyPosListener80mm(context, curEthernetConnect, lines));
 
