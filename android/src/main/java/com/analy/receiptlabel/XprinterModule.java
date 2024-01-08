@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.Printer;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -145,6 +146,10 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 receipt.setAlign(Paint.Align.LEFT);
                 receipt.setColor(Color.BLACK);
                 receipt.setTextSize(90F);
+
+                // For testing
+                printer.printString("Number of lines: " + lines.size());
+                printer.feedLine(1);
                 for (PrinterLine line : lines) {
                     if (line.isNewLine) {
                         receipt.addLine();
@@ -180,6 +185,10 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     lines.add(buildPrinterLine(splitPrefixText(inlineText)));
                 }
             }
+
+            PrinterLine newLine = new PrinterLine();
+            newLine.isNewLine = true;
+            lines.add(newLine);
         }
         return lines;
     }
