@@ -138,11 +138,11 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             POSPrinter printer = new POSPrinter(XprinterModule.curEthernetConnect);
             printer.initializePrinter();
             try {
-                int receiptWidth = 520;
+                int receiptWidth = 484;
                 float defaultTextSize = 75f;
 
-                ReceiptBuilder receipt = new ReceiptBuilder(receiptWidth);
-                receipt.setMargin(2, 2);
+                ReceiptBuilder receipt = new ReceiptBuilder(1200);
+                receipt.setMargin(1, 1);
                 receipt.setAlign(Paint.Align.LEFT);
                 receipt.setColor(Color.BLACK);
                 receipt.setTextSize(defaultTextSize);
