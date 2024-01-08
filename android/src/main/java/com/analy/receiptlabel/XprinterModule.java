@@ -32,6 +32,7 @@ import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.service.PosprinterService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -52,7 +53,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     BluetoothAdapter bluetoothAdapter;
     private Set<BluetoothDevice> mPairedDevices;
 
-    private IDeviceConnection curEthernetConnect = null;
+    private static IDeviceConnection curEthernetConnect = null;
 
     // bindService connection
     ServiceConnection conn = new ServiceConnection() {
@@ -79,6 +80,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         this.context.bindService(intent, conn, BIND_AUTO_CREATE);
         Log.v(NAME, "RNXNetprinter alloc");
 
+        // Try to print with new libs
+        POSConnect.init(this.context);
+
     }
 
     @Override
@@ -98,9 +102,18 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
 
         List<PrinterLine> lines = parsePayload(payload);
-        // Try to print with new libs
-        POSConnect.init(this.context);
-        curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+
+        boolean needToReconnect = false;
+        final List<String> toReconnectDebug = new ArrayList<>();
+        toReconnectDebug.add("Reconnect now : false");
+        if (curEthernetConnect == null || !curEthernetConnect.isConnect()) {
+            if (curEthernetConnect != null) {
+                curEthernetConnect.close();
+            }
+            curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+            needToReconnect = true;
+            toReconnectDebug.add("--> Reconnect: true");
+        }
         //curEthernetConnect.connect(ipAddress, new AnalyPosListener80mm(context, curEthernetConnect, lines));
 
         LiveEventBus.get("EVENT_CONNECT_STATUS").observeForever(new Observer<Object>() {
@@ -113,7 +126,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                             POSPrinter printer = new POSPrinter(curEthernetConnect);
                             printer.initializePrinter();
                             try {
-                                printer.printString("Đây là nắng nem nướng nha trang");
+                                printer.printString("Đây là nắng nem nướng nha trang " + toReconnectDebug.toString());
                                 ReceiptBuilder receipt = new ReceiptBuilder(1200);
                                 receipt.setMargin(2, 2);
                                 receipt.setAlign(Paint.Align.LEFT);
@@ -166,21 +179,26 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             }
         });
 
-        curEthernetConnect.connect(ipAddress, new IPOSListener() {
-            @Override
-            public void onStatus(int i, String s) {
-                switch (i) {
-                    case POSConnect.CONNECT_SUCCESS: {
-                        LiveEventBus.get("EVENT_CONNECT_STATUS").post(true);
-                        break;
+        if (needToReconnect) {
+            curEthernetConnect.connect(ipAddress, new IPOSListener() {
+                @Override
+                public void onStatus(int i, String s) {
+                    switch (i) {
+                        case POSConnect.CONNECT_SUCCESS: {
+                            LiveEventBus.get("EVENT_CONNECT_STATUS").post(true);
+                            break;
+                        }
+                        case POSConnect.CONNECT_FAIL: {
+                            break;
+                        }
                     }
-                    case POSConnect.CONNECT_FAIL: {
-                        break;
-                    }
-                }
 
-            }
-        });
+                }
+            });
+        } else {
+            // Trigger print now.
+            LiveEventBus.get("EVENT_CONNECT_STATUS").post(true);
+        }
     }
 
     private List<PrinterLine> parsePayload(String payload) {
