@@ -7,6 +7,8 @@ import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.IBinder;
 import android.util.Log;
@@ -17,9 +19,15 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.analy.receiptlabel.utils.StringUtils;
 import com.facebook.react.module.annotations.ReactModule;
+import com.github.danielfelgar.drawreceiptlib.ReceiptBuilder;
+import com.jeremyliao.liveeventbus.LiveEventBus;
+import androidx.lifecycle.Observer;
 
 import net.posprinter.IDeviceConnection;
+import net.posprinter.IPOSListener;
 import net.posprinter.POSConnect;
+import net.posprinter.POSConst;
+import net.posprinter.POSPrinter;
 import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.service.PosprinterService;
 
@@ -93,8 +101,86 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         // Try to print with new libs
         POSConnect.init(this.context);
         curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
-        curEthernetConnect.connect(ipAddress, new AnalyPosListener80mm(context, curEthernetConnect, lines));
+        //curEthernetConnect.connect(ipAddress, new AnalyPosListener80mm(context, curEthernetConnect, lines));
 
+        curEthernetConnect.connect(ipAddress, new IPOSListener() {
+            @Override
+            public void onStatus(int i, String s) {
+                switch (i) {
+                    case POSConnect.CONNECT_SUCCESS: {
+                        LiveEventBus.get("EVENT_CONNECT_STATUS").post(true);
+                        break;
+                    }
+                    case POSConnect.CONNECT_FAIL: {
+                        break;
+                    }
+                }
+
+            }
+        });
+
+        LiveEventBus.get("EVENT_CONNECT_STATUS").observeForever(new Observer<Object>() {
+            @Override
+            public void onChanged(Object result) {
+                if (result instanceof  Boolean) {
+                    boolean bResult = (Boolean) result;
+                    if (bResult == true) {
+                        try {
+                            POSPrinter printer = new POSPrinter(curEthernetConnect);
+                            printer.initializePrinter();
+                            try {
+                                printer.printString("Đây là nắng nem nướng nha trang");
+                                ReceiptBuilder receipt = new ReceiptBuilder(1200);
+                                receipt.setMargin(2, 2);
+                                receipt.setAlign(Paint.Align.LEFT);
+                                receipt.setColor(Color.BLACK);
+                                receipt.setTextSize(90F);
+                                printer.printString("Tới đây 1");
+                                for (PrinterLine line : lines) {
+                                    if (line.isNewLine) {
+                                        receipt.addLine();
+                                        continue;
+                                    }
+                                    printer.printString("Tới đây 2");
+                                    //receipt.setTypeface(this.context, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
+                                    receipt.setTextSize(line.textSize != null ? line.textSize : 75F);
+                                    receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
+                                    receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
+                                    receipt.addText(line.text, line.isNewLine);
+                                    printer.printString("Tới đây 3 " + "- " + line.text);
+                                }
+                                printer.printString("Tới đây 4");
+
+
+                                ReceiptBuilder receipt2 = new ReceiptBuilder(1200);
+                                receipt2.setMargin(2, 2);
+                                receipt2.setAlign(Paint.Align.LEFT);
+                                receipt2.setColor(Color.BLACK);
+                                receipt2.setTextSize(90F);
+                                receipt2.addText("Bún mắm nêm bún nem nướng Tôi yêu tổ quốc tôi lắm. Đây là nắng nem nướng nha trang à ứ ừ ư ự!\n");
+                                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                                Bitmap imageToPrint = receipt2.build();
+                                if (imageToPrint == null) {
+                                    printer.printString("Tới đây 5 NULL");
+                                } else {
+                                    printer.printString("Tới đây 5 NOT NULL");
+                                }
+                                printer.feedLine(2);
+                                printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, 484);
+                            } catch (Exception ex) {
+                                printer.printString("Tới đây 6" + ex.getMessage());
+                            }
+                            printer.feedLine();
+                            printer.cutHalfAndFeed(1);
+                        } catch (Exception ex) {
+                            // Error while printing
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private List<PrinterLine> parsePayload(String payload) {

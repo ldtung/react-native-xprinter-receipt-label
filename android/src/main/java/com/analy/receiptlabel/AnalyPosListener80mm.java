@@ -79,9 +79,7 @@ public class AnalyPosListener80mm implements IPOSListener {
                             printer.printString("Tới đây 5 NOT NULL");
                         }
                         printer.feedLine(2);
-                        printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, 484)
-                                .feedLine()
-                                .cutHalfAndFeed(1);
+                        printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, 484);
                     } catch (Exception ex) {
                         printer.printString("Tới đây 6" + ex.getMessage());
                     }
