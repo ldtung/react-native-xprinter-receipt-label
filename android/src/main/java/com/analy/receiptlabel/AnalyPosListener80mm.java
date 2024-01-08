@@ -1,5 +1,6 @@
 package com.analy.receiptlabel;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
 
@@ -60,11 +61,29 @@ public class AnalyPosListener80mm implements IPOSListener {
                             printer.printString("Tới đây 3 " + "- " + line.text);
                         }
                         printer.printString("Tới đây 4");
-                        printer.feedLine(2);
 
-                        printer.printBitmap(receipt.build(), POSConst.ALIGNMENT_CENTER, 484);
+
+                        ReceiptBuilder receipt2 = new ReceiptBuilder(1200);
+                        receipt2.setMargin(2, 2);
+                        receipt2.setAlign(Paint.Align.LEFT);
+                        receipt2.setColor(Color.BLACK);
+                        receipt2.setTextSize(90F);
+                        receipt2.addText("Bún mắm nêm bún nem nướng Tôi yêu tổ quốc tôi lắm. Đây là nắng nem nướng nha trang à ứ ừ ư ự!\n");
+                        receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                        receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                        receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                        Bitmap imageToPrint = receipt2.build();
+                        if (imageToPrint == null) {
+                            printer.printString("Tới đây 5 NULL");
+                        } else {
+                            printer.printString("Tới đây 5 NOT NULL");
+                        }
+                        printer.feedLine(2);
+                        printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, 484)
+                                .feedLine()
+                                .cutHalfAndFeed(1);
                     } catch (Exception ex) {
-                        printer.printString("Tới đây 5" + ex.getMessage());
+                        printer.printString("Tới đây 6" + ex.getMessage());
                     }
                     printer.feedLine();
                     printer.cutHalfAndFeed(1);
