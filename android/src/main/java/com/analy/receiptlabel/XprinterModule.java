@@ -106,86 +106,24 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         boolean needToReconnect = false;
         final List<String> toReconnectDebug = new ArrayList<>();
         toReconnectDebug.add("Reconnect now : false");
-        if (curEthernetConnect == null || !curEthernetConnect.isConnect()) {
-            if (curEthernetConnect != null) {
-                curEthernetConnect.close();
+        if (XprinterModule.curEthernetConnect == null || !XprinterModule.curEthernetConnect.isConnect()) {
+            if (XprinterModule.curEthernetConnect != null) {
+                XprinterModule.curEthernetConnect.close();
+                toReconnectDebug.add("--> Reconnect closed: true");
+            } else {
+                toReconnectDebug.add("--> Reconnect: true");
             }
-            curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+            XprinterModule.curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
             needToReconnect = true;
-            toReconnectDebug.add("--> Reconnect: true");
         }
         //curEthernetConnect.connect(ipAddress, new AnalyPosListener80mm(context, curEthernetConnect, lines));
-
-        LiveEventBus.get("EVENT_CONNECT_STATUS").observeForever(new Observer<Object>() {
-            @Override
-            public void onChanged(Object result) {
-                if (result instanceof  Boolean) {
-                    boolean bResult = (Boolean) result;
-                    if (bResult == true) {
-                        try {
-                            POSPrinter printer = new POSPrinter(curEthernetConnect);
-                            printer.initializePrinter();
-                            try {
-                                printer.printString("Đây là nắng nem nướng nha trang " + toReconnectDebug.toString());
-                                ReceiptBuilder receipt = new ReceiptBuilder(1200);
-                                receipt.setMargin(2, 2);
-                                receipt.setAlign(Paint.Align.LEFT);
-                                receipt.setColor(Color.BLACK);
-                                receipt.setTextSize(90F);
-                                printer.printString("Tới đây 1");
-                                for (PrinterLine line : lines) {
-                                    if (line.isNewLine) {
-                                        receipt.addLine();
-                                        continue;
-                                    }
-                                    printer.printString("Tới đây 2");
-                                    //receipt.setTypeface(this.context, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
-                                    receipt.setTextSize(line.textSize != null ? line.textSize : 75F);
-                                    receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
-                                    receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
-                                    receipt.addText(line.text, line.isNewLine);
-                                    printer.printString("Tới đây 3 " + "- " + line.text);
-                                }
-                                printer.printString("Tới đây 4");
-
-
-                                ReceiptBuilder receipt2 = new ReceiptBuilder(1200);
-                                receipt2.setMargin(2, 2);
-                                receipt2.setAlign(Paint.Align.LEFT);
-                                receipt2.setColor(Color.BLACK);
-                                receipt2.setTextSize(90F);
-                                receipt2.addText("Bún mắm nêm bún nem nướng Tôi yêu tổ quốc tôi lắm. Đây là nắng nem nướng nha trang à ứ ừ ư ự!\n");
-                                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
-                                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
-                                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
-                                Bitmap imageToPrint = receipt2.build();
-                                if (imageToPrint == null) {
-                                    printer.printString("Tới đây 5 NULL");
-                                } else {
-                                    printer.printString("Tới đây 5 NOT NULL");
-                                }
-                                printer.feedLine(2);
-                                printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, 484);
-                            } catch (Exception ex) {
-                                printer.printString("Tới đây 6" + ex.getMessage());
-                            }
-                            printer.feedLine();
-                            printer.cutHalfAndFeed(1);
-                        } catch (Exception ex) {
-                            // Error while printing
-                        }
-                    }
-                }
-            }
-        });
-
         if (needToReconnect) {
-            curEthernetConnect.connect(ipAddress, new IPOSListener() {
+            XprinterModule.curEthernetConnect.connect(ipAddress, new IPOSListener() {
                 @Override
                 public void onStatus(int i, String s) {
                     switch (i) {
                         case POSConnect.CONNECT_SUCCESS: {
-                            LiveEventBus.get("EVENT_CONNECT_STATUS").post(true);
+                            doPrintingService(toReconnectDebug, lines);
                             break;
                         }
                         case POSConnect.CONNECT_FAIL: {
@@ -197,7 +135,62 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             });
         } else {
             // Trigger print now.
-            LiveEventBus.get("EVENT_CONNECT_STATUS").post(true);
+            doPrintingService(toReconnectDebug, lines);
+        }
+    }
+
+    private static void doPrintingService(List<String> toReconnectDebug, List<PrinterLine> lines) {
+        try {
+            POSPrinter printer = new POSPrinter(XprinterModule.curEthernetConnect);
+            printer.initializePrinter();
+            try {
+                printer.printString("Đây là nắng nem nướng nha trang " + toReconnectDebug.toString());
+                ReceiptBuilder receipt = new ReceiptBuilder(1200);
+                receipt.setMargin(2, 2);
+                receipt.setAlign(Paint.Align.LEFT);
+                receipt.setColor(Color.BLACK);
+                receipt.setTextSize(90F);
+                printer.printString("Tới đây 1");
+                for (PrinterLine line : lines) {
+                    if (line.isNewLine) {
+                        receipt.addLine();
+                        continue;
+                    }
+                    printer.printString("Tới đây 2");
+                    //receipt.setTypeface(this.context, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
+                    receipt.setTextSize(line.textSize != null ? line.textSize : 75F);
+                    receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
+                    receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
+                    receipt.addText(line.text, line.isNewLine);
+                    printer.printString("Tới đây 3 " + "- " + line.text);
+                }
+                printer.printString("Tới đây 4");
+
+
+                ReceiptBuilder receipt2 = new ReceiptBuilder(1200);
+                receipt2.setMargin(2, 2);
+                receipt2.setAlign(Paint.Align.LEFT);
+                receipt2.setColor(Color.BLACK);
+                receipt2.setTextSize(90F);
+                receipt2.addText("Bún mắm nêm bún nem nướng Tôi yêu tổ quốc tôi lắm. Đây là nắng nem nướng nha trang à ứ ừ ư ự!\n");
+                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                Bitmap imageToPrint = receipt2.build();
+                if (imageToPrint == null) {
+                    printer.printString("Tới đây 5 NULL");
+                } else {
+                    printer.printString("Tới đây 5 NOT NULL");
+                }
+                printer.feedLine(2);
+                printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, 484);
+            } catch (Exception ex) {
+                printer.printString("Tới đây 6" + ex.getMessage());
+            }
+            printer.feedLine();
+            printer.cutHalfAndFeed(1);
+        } catch (Exception ex) {
+            // Error while printing
         }
     }
 
