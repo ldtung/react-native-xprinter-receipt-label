@@ -145,7 +145,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 receipt.setMargin(2, 2);
                 receipt.setAlign(Paint.Align.LEFT);
                 receipt.setColor(Color.BLACK);
-                receipt.setTextSize(90F);
+                receipt.setTextSize(defaultTextSize);
 
                 // For testing
                 printer.printString("Number of lines: " + lines.size());
@@ -155,7 +155,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                         receipt.addLine();
                         continue;
                     }
-                    receipt.setTypeface(context, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
+                    //receipt.setTypeface(context, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
                     receipt.setTextSize(line.textSize != null ? line.textSize : defaultTextSize);
                     receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
                     receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
