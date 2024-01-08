@@ -103,22 +103,6 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
         //curEthernetConnect.connect(ipAddress, new AnalyPosListener80mm(context, curEthernetConnect, lines));
 
-        curEthernetConnect.connect(ipAddress, new IPOSListener() {
-            @Override
-            public void onStatus(int i, String s) {
-                switch (i) {
-                    case POSConnect.CONNECT_SUCCESS: {
-                        LiveEventBus.get("EVENT_CONNECT_STATUS").post(true);
-                        break;
-                    }
-                    case POSConnect.CONNECT_FAIL: {
-                        break;
-                    }
-                }
-
-            }
-        });
-
         LiveEventBus.get("EVENT_CONNECT_STATUS").observeForever(new Observer<Object>() {
             @Override
             public void onChanged(Object result) {
@@ -179,6 +163,22 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                         }
                     }
                 }
+            }
+        });
+
+        curEthernetConnect.connect(ipAddress, new IPOSListener() {
+            @Override
+            public void onStatus(int i, String s) {
+                switch (i) {
+                    case POSConnect.CONNECT_SUCCESS: {
+                        LiveEventBus.get("EVENT_CONNECT_STATUS").post(true);
+                        break;
+                    }
+                    case POSConnect.CONNECT_FAIL: {
+                        break;
+                    }
+                }
+
             }
         });
     }
