@@ -218,7 +218,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 } else if ("XL".equalsIgnoreCase(format)) {
                     line.textSize = 90F;
                 } else if ("L".equalsIgnoreCase(format)) {
-                    line.textSize = 85F;
+                    line.textSize = 80F;
                 } else if ("S".equalsIgnoreCase(format)) {
                     line.isSameLine = true;
                 } else if ("P".equalsIgnoreCase(format)) {
