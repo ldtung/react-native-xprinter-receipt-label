@@ -142,41 +142,34 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             POSPrinter printer = new POSPrinter(XprinterModule.curEthernetConnect);
             printer.initializePrinter();
             try {
-                ReceiptBuilder receipt2 = new ReceiptBuilder(1200);
-                receipt2.setMargin(2, 2);
-                receipt2.setAlign(Paint.Align.LEFT);
-                receipt2.setColor(Color.BLACK);
-                receipt2.setTextSize(90F);
-                receipt2.setTypeface(me, "fonts/RobotoMono-Bold.ttf");
-                receipt2.addText("Bún mắm nêm bún nem nướng Tôi yêu tổ quốc tôi lắm. Đây là nắng nem nướng nha trang à ứ ừ ư ự!\n");
-                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
-                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
-                receipt2.setTextSize(80F);
-                receipt2.setTypeface(me, "fonts/RobotoMono-Regular.ttf");
-                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
-                receipt2.setTextSize(70F);
-                receipt2.setTypeface(me, "fonts/RobotoMono-Regular.ttf");
-                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
-                receipt2.setTextSize(60F);
-                receipt2.setTypeface(me, "fonts/RobotoMono-Regular.ttf");
-                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
-                receipt2.addLine();
-
+                int marginDefault = 0;
+                int receiptBuilderWidth = 1200;
+                int receiptWidthFor80mm = 574;
+                String fontRegular = "fonts/RobotoMono-Regular.ttf";
+                String fontBold = "fonts/RobotoMono-Bold.ttf";
+                float defaultTextSize = 70F;
+                ReceiptBuilder receipt = new ReceiptBuilder(receiptBuilderWidth);
+                receipt.setMargin(marginDefault, marginDefault);
+                receipt.setAlign(Paint.Align.LEFT);
+                receipt.setColor(Color.BLACK);
+                receipt.setTextSize(defaultTextSize);
+                receipt.setTypeface(me, fontRegular);
                 for (PrinterLine line : lines) {
                     if (line.isNewLine) {
-                        receipt2.addLine();
+                        receipt.addLine();
                         continue;
                     }
-                    receipt2.setTypeface(me, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
-                    receipt2.setMargin(2, 2);
-                    receipt2.setTextSize(line.textSize != null ? line.textSize : 90F);
-                    receipt2.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
-                    receipt2.setColor(line.textColor != null ? line.textColor : Color.BLACK);
-                    receipt2.addText(line.text, !line.isSameLine);
+
+                    receipt.setTypeface(me, line.isBold ? fontBold : fontRegular);
+                    receipt.setMargin(marginDefault, marginDefault);
+                    receipt.setTextSize(line.textSize != null ? line.textSize : defaultTextSize);
+                    receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
+                    receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
+                    receipt.addText(line.text, !line.isSameLine);
                 }
-                Bitmap imageToPrint = receipt2.build();
-                printer.feedLine(2);
-                printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, 584);
+                Bitmap imageToPrint = receipt.build();
+                printer.feedLine(marginDefault);
+                printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, receiptWidthFor80mm);
             } catch (Exception ex) {
                 printer.printString("Have error in printing " + ex.getMessage());
             }
