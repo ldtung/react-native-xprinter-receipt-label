@@ -20,8 +20,6 @@ import com.facebook.react.bridge.ReactMethod;
 import com.analy.receiptlabel.utils.StringUtils;
 import com.facebook.react.module.annotations.ReactModule;
 import com.github.danielfelgar.drawreceiptlib.ReceiptBuilder;
-import com.jeremyliao.liveeventbus.LiveEventBus;
-import androidx.lifecycle.Observer;
 
 import net.posprinter.IDeviceConnection;
 import net.posprinter.IPOSListener;
