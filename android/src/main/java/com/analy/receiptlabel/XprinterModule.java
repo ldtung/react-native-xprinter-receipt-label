@@ -142,10 +142,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             POSPrinter printer = new POSPrinter(XprinterModule.curEthernetConnect);
             printer.initializePrinter();
             try {
-                printer.printString("Đây là nắng nem nướng nha trang " + toReconnectDebug.toString());
-                printer.printString("Tới đây 1");
-
-                ReceiptBuilder receipt2 = new ReceiptBuilder(584);
+                ReceiptBuilder receipt2 = new ReceiptBuilder(1200);
                 receipt2.setMargin(2, 2);
                 receipt2.setAlign(Paint.Align.LEFT);
                 receipt2.setColor(Color.BLACK);
@@ -170,26 +167,18 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                         receipt2.addLine();
                         continue;
                     }
-                    printer.printString("Tới đây 2");
                     receipt2.setTypeface(me, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
                     receipt2.setMargin(2, 2);
                     receipt2.setTextSize(line.textSize != null ? line.textSize : 90F);
                     receipt2.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
                     receipt2.setColor(line.textColor != null ? line.textColor : Color.BLACK);
-                    receipt2.addText("Line " +  line.text, true);
-                    printer.printString("Tới đây 3 " + "- " + line.text);
+                    receipt2.addText(line.text, !line.isSameLine);
                 }
-                printer.printString("Tới đây 4");
                 Bitmap imageToPrint = receipt2.build();
-                if (imageToPrint == null) {
-                    printer.printString("Tới đây 5 NULL");
-                } else {
-                    printer.printString("Tới đây 5 NOT NULL");
-                }
                 printer.feedLine(2);
                 printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, 584);
             } catch (Exception ex) {
-                printer.printString("Tới đây 6" + ex.getMessage());
+                printer.printString("Have error in printing " + ex.getMessage());
             }
             printer.feedLine();
             printer.cutHalfAndFeed(1);
@@ -231,6 +220,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     line.textSize = 90F;
                 } else if ("L".equalsIgnoreCase(format)) {
                     line.textSize = 85F;
+                } else if ("S".equalsIgnoreCase(format)) {
+                    line.isSameLine = true;
                 }
             }
         }
@@ -238,7 +229,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     }
 
     public static List<String> splitString(String input) {
-        String[] letters = {"C", "B", "R", "XL", "L"};
+        String[] letters = {"S", "C", "B", "R", "XL", "L"};
         String regexPattern = generateRegexPattern(letters);
         Pattern pattern = Pattern.compile(regexPattern);
         Matcher matcher = pattern.matcher(input);
