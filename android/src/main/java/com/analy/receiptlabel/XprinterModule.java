@@ -169,6 +169,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
                     receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
                     receipt.addText(line.text, !line.isSameLine);
+                    if (!line.isSameLine && line.textSize != null && line.textSize > defaultTextSize) {
+                        receipt.addBlankSpace(15);
+                    }
                 }
                 Bitmap imageToPrint = receipt.build();
                 printer.feedLine(marginDefault);
