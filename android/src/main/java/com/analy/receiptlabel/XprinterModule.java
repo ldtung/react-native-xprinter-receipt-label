@@ -186,7 +186,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     printer.printString("Tới đây 5 NOT NULL");
                 }
                 printer.feedLine(2);
-                printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, 484);
+                printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, 584);
             } catch (Exception ex) {
                 printer.printString("Tới đây 6" + ex.getMessage());
             }
