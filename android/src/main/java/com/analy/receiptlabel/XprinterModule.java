@@ -163,7 +163,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 receipt2.setTextSize(60F);
                 receipt2.setTypeface(me, "fonts/RobotoMono-Regular.ttf");
                 receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
-
+                receipt2.addLine();
+                
                 for (PrinterLine line : lines) {
                     if (line.isNewLine) {
                         receipt2.addLine();
@@ -175,7 +176,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     receipt2.setTextSize(line.textSize != null ? line.textSize : 90F);
                     receipt2.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
                     receipt2.setColor(line.textColor != null ? line.textColor : Color.BLACK);
-                    receipt2.addText(line.text, line.isNewLine);
+                    receipt2.addText("Line " +  line.text, true);
                     printer.printString("Tới đây 3 " + "- " + line.text);
                 }
                 printer.printString("Tới đây 4");
