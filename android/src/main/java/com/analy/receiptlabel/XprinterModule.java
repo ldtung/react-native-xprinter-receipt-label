@@ -154,6 +154,14 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 receipt2.addText("Bún mắm nêm bún nem nướng Tôi yêu tổ quốc tôi lắm. Đây là nắng nem nướng nha trang à ứ ừ ư ự!\n");
                 receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
                 receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                receipt2.setTextSize(80F);
+                receipt2.setTypeface(me, "fonts/RobotoMono-Regular.ttf");
+                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                receipt2.setTextSize(70F);
+                receipt2.setTypeface(me, "fonts/RobotoMono-Regular.ttf");
+                receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+                receipt2.setTextSize(60F);
+                receipt2.setTypeface(me, "fonts/RobotoMono-Regular.ttf");
                 receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
 
                 for (PrinterLine line : lines) {
