@@ -100,7 +100,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
 
         List<PrinterLine> lines = parsePayload(payload);
-
+        ReactApplicationContext me = this.context;
         boolean needToReconnect = false;
         final List<String> toReconnectDebug = new ArrayList<>();
         toReconnectDebug.add("Reconnect now : false");
@@ -121,7 +121,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 public void onStatus(int i, String s) {
                     switch (i) {
                         case POSConnect.CONNECT_SUCCESS: {
-                            doPrintingService(toReconnectDebug, lines);
+                            doPrintingService(toReconnectDebug, me, lines);
                             break;
                         }
                         case POSConnect.CONNECT_FAIL: {
@@ -133,11 +133,11 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             });
         } else {
             // Trigger print now.
-            doPrintingService(toReconnectDebug, lines);
+            doPrintingService(toReconnectDebug, me, lines);
         }
     }
 
-    private static void doPrintingService(List<String> toReconnectDebug, List<PrinterLine> lines) {
+    private static void doPrintingService(List<String> toReconnectDebug, ReactApplicationContext me, List<PrinterLine> lines) {
         try {
             POSPrinter printer = new POSPrinter(XprinterModule.curEthernetConnect);
             printer.initializePrinter();
@@ -170,6 +170,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 receipt2.setAlign(Paint.Align.LEFT);
                 receipt2.setColor(Color.BLACK);
                 receipt2.setTextSize(90F);
+                receipt2.setTypeface(me, "fonts/RobotoMono-Bold.ttf");
                 receipt2.addText("Bún mắm nêm bún nem nướng Tôi yêu tổ quốc tôi lắm. Đây là nắng nem nướng nha trang à ứ ừ ư ự!\n");
                 receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
                 receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
