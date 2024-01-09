@@ -158,6 +158,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     if (line.isNewLine) {
                         receipt.addLine();
                         continue;
+                    } else if (line.isParagraph) {
+                        receipt.addParagraph();
+                        continue;
                     }
 
                     receipt.setTypeface(me, line.isBold ? fontBold : fontRegular);
@@ -215,6 +218,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     line.textSize = 85F;
                 } else if ("S".equalsIgnoreCase(format)) {
                     line.isSameLine = true;
+                } else if ("P".equalsIgnoreCase(format)) {
+                    line.isParagraph = true;
                 }
             }
         }
@@ -222,7 +227,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     }
 
     public static List<String> splitString(String input) {
-        String[] letters = {"S", "C", "B", "R", "XL", "L"};
+        String[] letters = {"P", "S", "C", "B", "R", "XL", "L"};
         String regexPattern = generateRegexPattern(letters);
         Pattern pattern = Pattern.compile(regexPattern);
         Matcher matcher = pattern.matcher(input);

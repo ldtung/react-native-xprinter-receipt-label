@@ -12,4 +12,6 @@ public class PrinterLine {
     boolean isBold = false;
 
     boolean isSameLine = false;
+
+    boolean isParagraph = false;
 }
