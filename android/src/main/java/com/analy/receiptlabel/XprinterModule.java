@@ -143,27 +143,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             printer.initializePrinter();
             try {
                 printer.printString("Đây là nắng nem nướng nha trang " + toReconnectDebug.toString());
-                ReceiptBuilder receipt = new ReceiptBuilder(1200);
-                receipt.setMargin(2, 2);
-                receipt.setAlign(Paint.Align.LEFT);
-                receipt.setColor(Color.BLACK);
-                receipt.setTextSize(90F);
                 printer.printString("Tới đây 1");
-                for (PrinterLine line : lines) {
-                    if (line.isNewLine) {
-                        receipt.addLine();
-                        continue;
-                    }
-                    printer.printString("Tới đây 2");
-                    //receipt.setTypeface(this.context, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
-                    receipt.setTextSize(line.textSize != null ? line.textSize : 75F);
-                    receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
-                    receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
-                    receipt.addText(line.text, line.isNewLine);
-                    printer.printString("Tới đây 3 " + "- " + line.text);
-                }
-                printer.printString("Tới đây 4");
-
 
                 ReceiptBuilder receipt2 = new ReceiptBuilder(1200);
                 receipt2.setMargin(2, 2);
@@ -175,6 +155,21 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
                 receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
                 receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
+
+                for (PrinterLine line : lines) {
+                    if (line.isNewLine) {
+                        receipt2.addLine();
+                        continue;
+                    }
+                    printer.printString("Tới đây 2");
+                    receipt2.setTypeface(me, line.isBold ? "fonts/RobotoMono-Bold.ttf" : "fonts/RobotoMono-Regular.ttf");
+                    receipt2.setTextSize(line.textSize != null ? line.textSize : 75F);
+                    receipt2.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
+                    receipt2.setColor(line.textColor != null ? line.textColor : Color.BLACK);
+                    receipt2.addText(line.text, line.isNewLine);
+                    printer.printString("Tới đây 3 " + "- " + line.text);
+                }
+                printer.printString("Tới đây 4");
                 Bitmap imageToPrint = receipt2.build();
                 if (imageToPrint == null) {
                     printer.printString("Tới đây 5 NULL");
