@@ -145,7 +145,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 printer.printString("Đây là nắng nem nướng nha trang " + toReconnectDebug.toString());
                 printer.printString("Tới đây 1");
 
-                ReceiptBuilder receipt2 = new ReceiptBuilder(1200);
+                ReceiptBuilder receipt2 = new ReceiptBuilder(584);
                 receipt2.setMargin(2, 2);
                 receipt2.setAlign(Paint.Align.LEFT);
                 receipt2.setColor(Color.BLACK);
@@ -164,7 +164,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 receipt2.setTypeface(me, "fonts/RobotoMono-Regular.ttf");
                 receipt2.addText("Tôi yêu tiếng việt việt nam, tôi là người việt nam, kiêu hùng", true);
                 receipt2.addLine();
-                
+
                 for (PrinterLine line : lines) {
                     if (line.isNewLine) {
                         receipt2.addLine();
