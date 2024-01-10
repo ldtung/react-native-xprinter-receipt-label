@@ -167,6 +167,10 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 break;
             }
         }
+        if (StringUtils.isBlank(usbPathAddress)) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
         if (needToReconnect) {
             XprinterModule.curUsbConnect.connect(usbPathAddress, new IPOSListener() {
                 @Override
