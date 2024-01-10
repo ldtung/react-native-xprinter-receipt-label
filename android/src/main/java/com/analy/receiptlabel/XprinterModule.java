@@ -356,7 +356,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 } else if ("C".equalsIgnoreCase(format)) {
                     line.align = Paint.Align.CENTER;
                 } else if ("XL".equalsIgnoreCase(format)) {
-                    line.textSize = 70F;
+                    line.textSize = 80F;
                 } else if ("L".equalsIgnoreCase(format)) {
                     line.textSize = 60F;
                 } else if ("S".equalsIgnoreCase(format)) {
