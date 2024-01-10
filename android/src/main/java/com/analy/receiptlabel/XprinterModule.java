@@ -359,6 +359,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     line.textSize = 90F;
                 } else if ("L".equalsIgnoreCase(format)) {
                     line.textSize = 60F;
+                } else if ("T".equalsIgnoreCase(format)) {
+                    line.textSize = 40F;
                 } else if ("S".equalsIgnoreCase(format)) {
                     line.isSameLine = true;
                 } else if ("P".equalsIgnoreCase(format)) {
@@ -370,7 +372,15 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     }
 
     public static List<String> splitString(String input) {
-        String[] letters = {"P", "S", "C", "B", "R", "XL", "L"};
+        // P: Paragraph
+        // S: Same line
+        // C: center
+        // B: Bold
+        // R: Right
+        // XL: Size big text
+        // L: Size medium text
+        // T: Tiny text (for lable printer)
+        String[] letters = {"P", "S", "C", "B", "R", "XL", "L", "T"};
         String regexPattern = generateRegexPattern(letters);
         Pattern pattern = Pattern.compile(regexPattern);
         Matcher matcher = pattern.matcher(input);
