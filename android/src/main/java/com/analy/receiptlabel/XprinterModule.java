@@ -191,6 +191,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             // Trigger print now.
             doPrintingService(me, lines, receiptWidth);
         }
+
+        promise.resolve(true);
     }
 
     private void printBluetooth(String macAddress, String payload, Promise promise, int receiptWidth) {
@@ -233,6 +235,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             // Trigger print now.
             doPrintingService(me, lines, receiptWidth);
         }
+
+        promise.resolve(true);
     }
 
     private void printTcp(String ipAddress, int port, String payload, Promise promise, int receiptWidth) {
@@ -276,6 +280,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             // Trigger print now.
             doPrintingService(me, lines, receiptWidth);
         }
+
+        promise.resolve(true);
     }
 
     private static void doPrintingService(ReactApplicationContext me, List<PrinterLine> lines, int receiptWidth) {
