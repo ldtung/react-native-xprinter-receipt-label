@@ -247,13 +247,13 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = this.context;
         boolean needToReconnect = false;
-        if (XprinterModule.curEthernetConnect == null || !XprinterModule.curEthernetConnect.isConnect()) {
+//        if (XprinterModule.curEthernetConnect == null || !XprinterModule.curEthernetConnect.isConnect()) {
             if (XprinterModule.curEthernetConnect != null) {
                 XprinterModule.curEthernetConnect.close();
             }
             XprinterModule.curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
             needToReconnect = true;
-        }
+//        }
         //curEthernetConnect.connect(ipAddress, new AnalyPosListener80mm(context, curEthernetConnect, lines));
 
         if (needToReconnect) {
