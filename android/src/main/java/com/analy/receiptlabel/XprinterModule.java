@@ -177,7 +177,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 public void onStatus(int i, String s) {
                     switch (i) {
                         case POSConnect.CONNECT_SUCCESS: {
-                            doPrintingService(me, lines, receiptWidth);
+                            doPrintingService(me, lines, receiptWidth, promise);
                             break;
                         }
                         case POSConnect.CONNECT_FAIL: {
@@ -189,10 +189,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             });
         } else {
             // Trigger print now.
-            doPrintingService(me, lines, receiptWidth);
+            doPrintingService(me, lines, receiptWidth, promise);
         }
-
-        promise.resolve(true);
     }
 
     private void printBluetooth(String macAddress, String payload, Promise promise, int receiptWidth) {
@@ -221,7 +219,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 public void onStatus(int i, String s) {
                     switch (i) {
                         case POSConnect.CONNECT_SUCCESS: {
-                            doPrintingService(me, lines, receiptWidth);
+                            doPrintingService(me, lines, receiptWidth, promise);
                             break;
                         }
                         case POSConnect.CONNECT_FAIL: {
@@ -233,10 +231,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             });
         } else {
             // Trigger print now.
-            doPrintingService(me, lines, receiptWidth);
+            doPrintingService(me, lines, receiptWidth, promise);
         }
-
-        promise.resolve(true);
     }
 
     private void printTcp(String ipAddress, int port, String payload, Promise promise, int receiptWidth) {
@@ -266,7 +262,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 public void onStatus(int i, String s) {
                     switch (i) {
                         case POSConnect.CONNECT_SUCCESS: {
-                            doPrintingService(me, lines, receiptWidth);
+                            doPrintingService(me, lines, receiptWidth, promise);
                             break;
                         }
                         case POSConnect.CONNECT_FAIL: {
@@ -278,13 +274,11 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             });
         } else {
             // Trigger print now.
-            doPrintingService(me, lines, receiptWidth);
+            doPrintingService(me, lines, receiptWidth, promise);
         }
-
-        promise.resolve(true);
     }
 
-    private static void doPrintingService(ReactApplicationContext me, List<PrinterLine> lines, int receiptWidth) {
+    private static void doPrintingService(ReactApplicationContext me, List<PrinterLine> lines, int receiptWidth, Promise promise) {
         try {
             POSPrinter printer = new POSPrinter(XprinterModule.curEthernetConnect);
             printer.initializePrinter();
@@ -323,12 +317,15 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 printer.feedLine(marginDefault);
                 printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, receiptWidth);
             } catch (Exception ex) {
-                printer.printString("Have error in printing " + ex.getMessage());
+                promise.reject("-1", "Have error in preparing printing " + ex.getMessage());
+                return;
             }
             printer.feedLine();
             printer.cutHalfAndFeed(1);
+            promise.resolve(true);
         } catch (Exception ex) {
             // Error while printing
+            promise.reject("-1", "There is an error while printing " + ex.getMessage());
         }
     }
 
