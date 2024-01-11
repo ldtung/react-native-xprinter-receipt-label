@@ -287,7 +287,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 int receiptBuilderWidth = 1200;
                 String fontRegular = "fonts/RobotoMono-Regular.ttf";
                 String fontBold = "fonts/RobotoMono-Bold.ttf";
-                float defaultTextSize = 70F;
+                float defaultTextSize = 60F;
                 ReceiptBuilder receipt = new ReceiptBuilder(receiptBuilderWidth);
                 receipt.setMargin(marginDefault, marginDefault);
                 receipt.setAlign(Paint.Align.LEFT);
@@ -361,8 +361,10 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 } else if ("XL".equalsIgnoreCase(format)) {
                     line.textSize = 90F;
                 } else if ("L".equalsIgnoreCase(format)) {
-                    line.textSize = 80F;
+                    line.textSize = 70F;
                 } else if ("T".equalsIgnoreCase(format)) {
+                    line.textSize = 50F;
+                } else if ("VT".equalsIgnoreCase(format)) {
                     line.textSize = 40F;
                 } else if ("S".equalsIgnoreCase(format)) {
                     line.isSameLine = true;
@@ -383,7 +385,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         // XL: Size big text
         // L: Size medium text
         // T: Tiny text (for lable printer)
-        String[] letters = {"P", "S", "C", "B", "R", "XL", "L", "T"};
+        // VT: Very tiny text
+        String[] letters = {"P", "S", "C", "B", "R", "XL", "L", "T", "VT"};
         String regexPattern = generateRegexPattern(letters);
         Pattern pattern = Pattern.compile(regexPattern);
         Matcher matcher = pattern.matcher(input);
