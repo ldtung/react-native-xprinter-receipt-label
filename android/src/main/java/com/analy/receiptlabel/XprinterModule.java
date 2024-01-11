@@ -287,7 +287,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 int receiptBuilderWidth = 1200;
                 String fontRegular = "fonts/RobotoMono-Regular.ttf";
                 String fontBold = "fonts/RobotoMono-Bold.ttf";
-                float defaultTextSize = 50F;
+                float defaultTextSize = 70F;
                 ReceiptBuilder receipt = new ReceiptBuilder(receiptBuilderWidth);
                 receipt.setMargin(marginDefault, marginDefault);
                 receipt.setAlign(Paint.Align.LEFT);
@@ -361,7 +361,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 } else if ("XL".equalsIgnoreCase(format)) {
                     line.textSize = 90F;
                 } else if ("L".equalsIgnoreCase(format)) {
-                    line.textSize = 60F;
+                    line.textSize = 80F;
                 } else if ("T".equalsIgnoreCase(format)) {
                     line.textSize = 40F;
                 } else if ("S".equalsIgnoreCase(format)) {
