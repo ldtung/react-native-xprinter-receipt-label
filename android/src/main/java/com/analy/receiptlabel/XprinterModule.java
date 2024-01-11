@@ -138,13 +138,13 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = this.context;
         boolean needToReconnect = false;
-        if (XprinterModule.curUsbConnect == null || !XprinterModule.curUsbConnect.isConnect()) {
+//        if (XprinterModule.curUsbConnect == null || !XprinterModule.curUsbConnect.isConnect()) {
             if (XprinterModule.curUsbConnect != null) {
                 XprinterModule.curUsbConnect.close();
             }
             XprinterModule.curUsbConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
             needToReconnect = true;
-        }
+//        }
 
         String usbPathAddress = "";
         UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
@@ -205,13 +205,13 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = this.context;
         boolean needToReconnect = false;
-        if (XprinterModule.curBluetoothConnect == null || !XprinterModule.curBluetoothConnect.isConnect()) {
+//        if (XprinterModule.curBluetoothConnect == null || !XprinterModule.curBluetoothConnect.isConnect()) {
             if (XprinterModule.curBluetoothConnect != null) {
                 XprinterModule.curBluetoothConnect.close();
             }
             XprinterModule.curBluetoothConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
             needToReconnect = true;
-        }
+//        }
 
         if (needToReconnect) {
             XprinterModule.curBluetoothConnect.connect(macAddress, new IPOSListener() {
