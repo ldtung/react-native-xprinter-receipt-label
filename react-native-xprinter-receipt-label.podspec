@@ -12,8 +12,9 @@ Pod::Spec.new do |s|
   s.homepage     = package['homepage']
   s.platform     = :ios, "10.0"
 
-  s.source       = { :git => "https://github.com/demchenkoalex/react-native-module-template.git", :tag => "v#{s.version}" }
+  s.source       = { :git => "https://github.com/ldtung/react-native-xprinter-receipt-label.git", :tag => "v#{s.version}" }
   s.source_files  = "ios/**/*.{h,m,swift}"
 
   s.dependency 'React'
+  install_modules_dependencies(s)
 end

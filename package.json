@@ -13,7 +13,7 @@
     "android",
     "ios",
     "cpp",
-    "react-native-module-template.podspec",
+    "react-native-xprinter-receipt-label.podspec",
     "!lib/typescript/example",
     "!android/build",
     "!ios/build",
