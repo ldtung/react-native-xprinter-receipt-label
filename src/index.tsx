@@ -17,6 +17,11 @@ type NativeModuleType = typeof NativeModules & {
       port: number,
       payload: string,
     ): Promise<void>;
+    printLabelTcp(
+      ip: string,
+      port: number,
+      payload: string,
+    ): Promise<void>;
     printBluetooth80mm(
       macAddress: string,
       payload: string,
@@ -25,10 +30,17 @@ type NativeModuleType = typeof NativeModules & {
       macAddress: string,
       payload: string,
     ): Promise<void>;
+    printLabelBluetooth(
+      macAddress: string,
+      payload: string,
+    ): Promise<void>;
     printUsb80mm(
       payload: string,
     ): Promise<void>;
     printUsb58mm(
+      payload: string,
+    ): Promise<void>;
+    printLabelUsb(
       payload: string,
     ): Promise<void>;
     getBluetoothDeviceList(): Promise<BluetoothPrinter[]>;
@@ -95,6 +107,21 @@ const printTcp58mm = async (
     payload,
     );
   };
+const printLabelTcp = async (
+  args: Partial<PrintTcpInterface> & Pick<PrinterInterface, 'payload'>
+): Promise<void> => {
+  const {
+    ip,
+    port,
+    payload,
+  } = getConfig(args);
+
+  await RNXprinter.printLabelTcp(
+    ip,
+    port,
+    payload,
+    );
+  };
 
 const printBluetooth80mm = (
   args: Partial<PrintBluetoothInterface> & Pick<PrinterInterface, 'payload'>
@@ -124,6 +151,20 @@ const printBluetooth58mm = (
   );
 };
 
+const printLabelBluetooth = (
+  args: Partial<PrintBluetoothInterface> & Pick<PrinterInterface, 'payload'>
+): Promise<void> => {
+  const {
+    macAddress,
+    payload,
+  } = getConfig(args);
+
+  return RNXprinter.printLabelBluetooth(
+    macAddress,
+    payload,
+  );
+};
+
 const printUsb80mm = (
   args: Partial<PrintBluetoothInterface> & Pick<PrinterInterface, 'payload'>
 ): Promise<void> => {
@@ -148,6 +189,18 @@ const printUsb58mm = (
   );
 };
 
+const printLabelUsb = (
+  args: Partial<PrintBluetoothInterface> & Pick<PrinterInterface, 'payload'>
+): Promise<void> => {
+  const {
+    payload,
+  } = getConfig(args);
+
+  return RNXprinter.printLabelUsb(
+    payload,
+  );
+};
+
 const getBluetoothDeviceList = (): Promise<BluetoothPrinter[]> => {
   return RNXprinter.getBluetoothDeviceList();
 };
@@ -159,6 +212,9 @@ export default {
   printBluetooth58mm,
   printUsb80mm,
   printUsb58mm,
+  printLabelTcp,
+  printLabelBluetooth,
+  printLabelUsb,
   defaultConfig,
   getBluetoothDeviceList,
 };

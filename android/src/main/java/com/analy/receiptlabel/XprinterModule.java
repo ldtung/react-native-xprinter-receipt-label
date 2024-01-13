@@ -59,6 +59,11 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 
     private static IDeviceConnection curUsbConnect = null;
 
+    private static IDeviceConnection curEthernetConnectLabelPrinting = null;
+    private static IDeviceConnection curBluetoothConnectLabelPrinting = null;
+
+    private static IDeviceConnection curUsbConnectLabelPrinting = null;
+
     // bindService connection
     ServiceConnection conn = new ServiceConnection() {
         @Override
@@ -107,6 +112,13 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void printLabelTcp(String ipAddress, int port, String payload, final Promise promise) {
+        int receiptWidth = 408;
+        printLabelTcp(ipAddress, port, payload, promise, receiptWidth);
+    }
+
+
+    @ReactMethod
     public void printBluetooth80mm(String macAddress, String payload, final Promise promise) {
         int receiptWidth = 574;
         printBluetooth(macAddress, payload, promise, receiptWidth);
@@ -119,6 +131,12 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void printLabelBluetooth(String macAddress, String payload, final Promise promise) {
+        int receiptWidth = 408;
+        printLabelBluetooth(macAddress, payload, promise, receiptWidth);
+    }
+
+    @ReactMethod
     public void printUsb80mm(String payload, final Promise promise) {
         int receiptWidth = 574;
         printUsb(payload, promise, receiptWidth);
@@ -128,6 +146,12 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     public void printUsb58mm(String payload, final Promise promise) {
         int receiptWidth = 408;
         printUsb(payload, promise, receiptWidth);
+    }
+
+    @ReactMethod
+    public void printLabelUsb(String payload, final Promise promise) {
+        int receiptWidth = 408;
+        printLabelUsb(payload, promise, receiptWidth);
     }
 
     private void printUsb(String payload, Promise promise, int receiptWidth) {
@@ -193,6 +217,69 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
     }
 
+    private void printLabelUsb(String payload, Promise promise, int receiptWidth) {
+        if (StringUtils.isBlank(payload)) {
+            promise.reject("-1", "Should provide valid pageLoad to print");
+            return;
+        }
+        List<PrinterLine> lines = parsePayload(payload);
+        ReactApplicationContext me = this.context;
+        boolean needToReconnect = false;
+//        if (XprinterModule.curUsbConnect == null || !XprinterModule.curUsbConnect.isConnect()) {
+        if (XprinterModule.curUsbConnectLabelPrinting != null) {
+            XprinterModule.curUsbConnectLabelPrinting.close();
+        }
+        XprinterModule.curUsbConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
+        needToReconnect = true;
+//        }
+
+        String usbPathAddress = "";
+        UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+        if (usbManager == null) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
+        Collection<UsbDevice> devicesList = usbManager.getDeviceList().values();
+        if (devicesList == null || devicesList.size() == 0) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
+        for (UsbDevice device : devicesList) {
+            int usbClass = device.getDeviceClass();
+            if((usbClass == UsbConstants.USB_CLASS_PER_INTERFACE || usbClass == UsbConstants.USB_CLASS_MISC ) && UsbDeviceHelper.findPrinterInterface(device) != null) {
+                usbClass = UsbConstants.USB_CLASS_PRINTER;
+            }
+            if (usbClass == UsbConstants.USB_CLASS_PRINTER) {
+                usbPathAddress = device.getDeviceName();
+                break;
+            }
+        }
+        if (StringUtils.isBlank(usbPathAddress)) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
+        if (needToReconnect) {
+            XprinterModule.curUsbConnectLabelPrinting.connect(usbPathAddress, new IPOSListener() {
+                @Override
+                public void onStatus(int i, String s) {
+                    switch (i) {
+                        case POSConnect.CONNECT_SUCCESS: {
+                            doPrintingService(me, lines, receiptWidth, promise);
+                            break;
+                        }
+                        case POSConnect.CONNECT_FAIL: {
+                            break;
+                        }
+                    }
+
+                }
+            });
+        } else {
+            // Trigger print now.
+            doPrintingService(me, lines, receiptWidth, promise);
+        }
+    }
+
     private void printBluetooth(String macAddress, String payload, Promise promise, int receiptWidth) {
         if (StringUtils.isBlank(macAddress) ) {
             promise.reject("-1", "Should provide valid mac address");
@@ -215,6 +302,48 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 
         if (needToReconnect) {
             XprinterModule.curBluetoothConnect.connect(macAddress, new IPOSListener() {
+                @Override
+                public void onStatus(int i, String s) {
+                    switch (i) {
+                        case POSConnect.CONNECT_SUCCESS: {
+                            doPrintingService(me, lines, receiptWidth, promise);
+                            break;
+                        }
+                        case POSConnect.CONNECT_FAIL: {
+                            break;
+                        }
+                    }
+
+                }
+            });
+        } else {
+            // Trigger print now.
+            doPrintingService(me, lines, receiptWidth, promise);
+        }
+    }
+
+    private void printLabelBluetooth(String macAddress, String payload, Promise promise, int receiptWidth) {
+        if (StringUtils.isBlank(macAddress) ) {
+            promise.reject("-1", "Should provide valid mac address");
+            return;
+        }
+        if (StringUtils.isBlank(payload)) {
+            promise.reject("-1", "Should provide valid pageLoad to print");
+            return;
+        }
+        List<PrinterLine> lines = parsePayload(payload);
+        ReactApplicationContext me = this.context;
+        boolean needToReconnect = false;
+//        if (XprinterModule.curBluetoothConnect == null || !XprinterModule.curBluetoothConnect.isConnect()) {
+        if (XprinterModule.curBluetoothConnectLabelPrinting != null) {
+            XprinterModule.curBluetoothConnectLabelPrinting.close();
+        }
+        XprinterModule.curBluetoothConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
+        needToReconnect = true;
+//        }
+
+        if (needToReconnect) {
+            XprinterModule.curBluetoothConnectLabelPrinting.connect(macAddress, new IPOSListener() {
                 @Override
                 public void onStatus(int i, String s) {
                     switch (i) {
@@ -258,6 +387,46 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 
         if (needToReconnect) {
             XprinterModule.curEthernetConnect.connect(ipAddress, new IPOSListener() {
+                @Override
+                public void onStatus(int i, String s) {
+                    switch (i) {
+                        case POSConnect.CONNECT_SUCCESS: {
+                            doPrintingService(me, lines, receiptWidth, promise);
+                            break;
+                        }
+                        case POSConnect.CONNECT_FAIL: {
+                            break;
+                        }
+                    }
+
+                }
+            });
+        } else {
+            // Trigger print now.
+            doPrintingService(me, lines, receiptWidth, promise);
+        }
+    }
+
+    private void printLabelTcp(String ipAddress, int port, String payload, Promise promise, int receiptWidth) {
+        if (StringUtils.isBlank(ipAddress) || port <= 0) {
+            promise.reject("-1", "Should provide valid ip address");
+            return;
+        }
+        if (StringUtils.isBlank(payload)) {
+            promise.reject("-1", "Should provide valid pageLoad to print");
+            return;
+        }
+        List<PrinterLine> lines = parsePayload(payload);
+        ReactApplicationContext me = this.context;
+        boolean needToReconnect = false;
+        if (XprinterModule.curEthernetConnectLabelPrinting != null) {
+            XprinterModule.curEthernetConnectLabelPrinting.close();
+        }
+        XprinterModule.curEthernetConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+        needToReconnect = true;
+
+        if (needToReconnect) {
+            XprinterModule.curEthernetConnectLabelPrinting.connect(ipAddress, new IPOSListener() {
                 @Override
                 public void onStatus(int i, String s) {
                     switch (i) {
