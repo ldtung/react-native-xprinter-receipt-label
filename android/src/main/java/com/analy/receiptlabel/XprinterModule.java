@@ -58,6 +58,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 
     private static IDeviceConnection curEthernetConnect = null;
     private static final Object lockEthernet = new Object();
+    private static final Object lockPrintingAsync = new Object();
     private static final Object lockBluetooth = new Object();
     private static final Object lockUsb = new Object();
 
@@ -228,7 +229,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             doUsbPrintingAndRetry(promise, receiptWidth, lines, me, usbPathAddress, true);
         } else {
             // Trigger print now.
-            doPrintingService(me, lines, receiptWidth, promise);
+            synchronized (lockPrintingAsync) {
+                doPrintingService(me, lines, receiptWidth, promise);
+            }
         }
     }
 
@@ -319,7 +322,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             public void onStatus(int i, String s) {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
-                        doPrintingService(me, lines, receiptWidth, promise);
+                        synchronized (lockPrintingAsync) {
+                            doPrintingService(me, lines, receiptWidth, promise);
+                        }
                         break;
                     }
                     default: {
@@ -367,7 +372,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             doBluetoothPrintingAndRetry(macAddress, promise, receiptWidth, lines, me, true);
         } else {
             // Trigger print now.
-            doPrintingService(me, lines, receiptWidth, promise);
+            synchronized (lockPrintingAsync) {
+                doPrintingService(me, lines, receiptWidth, promise);
+            }
         }
     }
 
@@ -436,7 +443,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             public void onStatus(int i, String s) {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
-                        doPrintingService(me, lines, receiptWidth, promise);
+                        synchronized (lockPrintingAsync) {
+                            doPrintingService(me, lines, receiptWidth, promise);
+                        }
                         break;
                     }
                     default: {
@@ -484,7 +493,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             doTcpPrintingAndRetry(ipAddress, promise, receiptWidth, lines, me, true);
         } else {
             // Trigger print now.
-            doPrintingService(me, lines, receiptWidth, promise);
+            synchronized (lockPrintingAsync) {
+                doPrintingService(me, lines, receiptWidth, promise);
+            }
         }
     }
 
@@ -552,7 +563,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             public void onStatus(int i, String s) {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
-                        doPrintingService(me, lines, receiptWidth, promise);
+                        synchronized (lockPrintingAsync) {
+                            doPrintingService(me, lines, receiptWidth, promise);
+                        }
                         break;
                     }
                     default: {
