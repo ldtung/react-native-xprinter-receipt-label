@@ -34,6 +34,7 @@ import android.hardware.usb.UsbConstants;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -65,6 +66,10 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     private static final Object lockUsb = new Object();
 
     private static IDeviceConnection curEthernetConnect = null;
+    private static Date ethernetLastConnectTime = null;
+    private static Date bluetoothLastConnectTime = null;
+    private static Date usbLastConnectTime = null;
+    private static Long differentSecondsToReconnect = 4l;
     private static IDeviceConnection curBluetoothConnect = null;
     private static IDeviceConnection curUsbConnect = null;
 
@@ -159,18 +164,23 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
+
         boolean needToReconnect = false;
+        Date ethernetPrintingTimeNow = new Date();
+        if (usbLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - usbLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
 
-        try {
-            if (XprinterModule.curUsbConnect != null) {
-                XprinterModule.curUsbConnect.close();
-                Thread.sleep(200);
+            try {
+                if (XprinterModule.curUsbConnect != null) {
+                    XprinterModule.curUsbConnect.close();
+                }
+            } catch (Exception ex) {
+
             }
-        } catch (Exception ex) {
+            XprinterModule.curUsbConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
+            needToReconnect = true;
 
+            usbLastConnectTime = ethernetPrintingTimeNow;
         }
-        XprinterModule.curUsbConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
-        needToReconnect = true;
 
         String usbPathAddress = "";
         UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
@@ -224,7 +234,6 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                             try {
                                 if (curUsbConnect != null) {
                                     curUsbConnect.close();
-                                    Thread.sleep(200);
                                 }
                             } catch (Exception ex) {
 
@@ -251,17 +260,22 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        try {
-            if (XprinterModule.curBluetoothConnect != null) {
-                XprinterModule.curBluetoothConnect.close();
-                Thread.sleep(200);
+
+        Date ethernetPrintingTimeNow = new Date();
+        if (bluetoothLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - bluetoothLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
+            try {
+                if (XprinterModule.curBluetoothConnect != null) {
+                    XprinterModule.curBluetoothConnect.close();
+                }
+            } catch (Exception ex) {
+
             }
-        } catch (Exception ex) {
+            XprinterModule.curBluetoothConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
 
+            needToReconnect = true;
+
+            bluetoothLastConnectTime = ethernetPrintingTimeNow;
         }
-        XprinterModule.curBluetoothConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
-
-        needToReconnect = true;
 
         if (needToReconnect) {
             doBluetoothPrintingAndRetry(XprinterModule.curBluetoothConnect, macAddress, promise, receiptWidth, lines, me, true);
@@ -290,7 +304,6 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                             try {
                                 if (curBluetoothConnect != null) {
                                     curBluetoothConnect.close();
-                                    Thread.sleep(200);
                                 }
                             } catch (Exception ex) {
 
@@ -317,16 +330,19 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        try {
-            if (XprinterModule.curEthernetConnect != null) {
-                XprinterModule.curEthernetConnect.close();
-                Thread.sleep(200);
-            }
-        } catch (Exception ex) {
+        Date ethernetPrintingTimeNow = new Date();
+        if (ethernetLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - ethernetLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
+            try {
+                if (XprinterModule.curEthernetConnect != null) {
+                    XprinterModule.curEthernetConnect.close();
+                }
+            } catch (Exception ex) {
 
+            }
+            XprinterModule.curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+            needToReconnect = true;
+            ethernetLastConnectTime = ethernetPrintingTimeNow;
         }
-        XprinterModule.curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
-        needToReconnect = true;
 
         if (needToReconnect) {
             doTcpPrintingAndRetry(curEthernetConnect, ipAddress, promise, receiptWidth, lines, me, true);
@@ -354,7 +370,6 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                             try {
                                 if (curEthernetConnect != null) {
                                     curEthernetConnect.close();
-                                    Thread.sleep(200);
                                 }
                             } catch (Exception ex) {
 
