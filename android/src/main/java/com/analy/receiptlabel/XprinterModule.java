@@ -73,7 +73,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     private static Date ethernetLastConnectTime = null;
     private static Date bluetoothLastConnectTime = null;
     private static Date usbLastConnectTime = null;
-    private static Long differentSecondsToReconnect = 4l;
+    private static Long differentSecondsToReconnect = 15l;
     private static IDeviceConnection curBluetoothConnect = null;
     private static IDeviceConnection curUsbConnect = null;
 
@@ -202,7 +202,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 
         boolean needToReconnect = false;
         Date ethernetPrintingTimeNow = new Date();
-        if (usbLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - usbLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
+        if (XprinterModule.curUsbConnect == null || usbLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - usbLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
 
             try {
                 if (XprinterModule.curUsbConnect != null) {
@@ -389,7 +389,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         boolean needToReconnect = false;
 
         Date ethernetPrintingTimeNow = new Date();
-        if (bluetoothLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - bluetoothLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
+        if (XprinterModule.curBluetoothConnect == null || bluetoothLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - bluetoothLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
             try {
                 if (XprinterModule.curBluetoothConnect != null) {
                     XprinterModule.curBluetoothConnect.close();
@@ -529,7 +529,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
         Date ethernetPrintingTimeNow = new Date();
-        if (ethernetLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - ethernetLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
+        if (XprinterModule.curEthernetConnect == null || ethernetLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - ethernetLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
             try {
                 if (XprinterModule.curEthernetConnect != null) {
                     XprinterModule.curEthernetConnect.close();
