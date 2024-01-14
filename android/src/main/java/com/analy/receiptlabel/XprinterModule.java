@@ -262,7 +262,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         boolean needToReconnect = false;
 
         Date ethernetPrintingTimeNow = new Date();
-        if (usbLabelLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - usbLabelLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
+        if (XprinterModule.curUsbConnectLabelPrinting == null || usbLabelLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - usbLabelLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
 
             try {
                 if (XprinterModule.curUsbConnectLabelPrinting != null) {
@@ -428,7 +428,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         boolean needToReconnect = false;
 
         Date ethernetPrintingTimeNow = new Date();
-        if (bluetoothLabelLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - bluetoothLabelLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
+        if (XprinterModule.curBluetoothConnectLabelPrinting == null || bluetoothLabelLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - bluetoothLabelLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
 
             try {
                 if (XprinterModule.curBluetoothConnectLabelPrinting != null) {
@@ -566,7 +566,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         boolean needToReconnect = false;
 
         Date ethernetPrintingTimeNow = new Date();
-        if (ethernetLabelLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - ethernetLabelLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
+        if (XprinterModule.curEthernetConnectLabelPrinting == null || ethernetLabelLastConnectTime == null || (ethernetPrintingTimeNow.getTime() - ethernetLabelLastConnectTime.getTime()) / 1000 > differentSecondsToReconnect) {
 
             try {
                 if (XprinterModule.curEthernetConnectLabelPrinting != null) {
