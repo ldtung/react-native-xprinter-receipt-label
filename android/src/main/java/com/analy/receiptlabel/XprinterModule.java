@@ -56,7 +56,6 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     BluetoothAdapter bluetoothAdapter;
     private Set<BluetoothDevice> mPairedDevices;
 
-    private static IDeviceConnection curEthernetConnect = null;
     private static final Object lockEthernet = new Object();
     private static final Object lockPrintingAsync = new Object();
     private static final Object lockBluetooth = new Object();
@@ -66,10 +65,6 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 
     private static IDeviceConnection curUsbConnect = null;
 
-    private static IDeviceConnection curEthernetConnectLabelPrinting = null;
-    private static IDeviceConnection curBluetoothConnectLabelPrinting = null;
-
-    private static IDeviceConnection curUsbConnectLabelPrinting = null;
     private static final Object lockEthernetLabelPrinting = new Object();
     private static final Object lockBluetoothLabelPrinting = new Object();
     private static final Object lockUsbLabelPrinting = new Object();
@@ -191,14 +186,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        try {
-            if (XprinterModule.curUsbConnect != null) {
-                XprinterModule.curUsbConnect.close();
-            }
-        } catch (Exception ex) {
 
-        }
-        XprinterModule.curUsbConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
+        IDeviceConnection curUsbConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
         needToReconnect = true;
 
         String usbPathAddress = "";
@@ -227,11 +216,11 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             return;
         }
         if (needToReconnect) {
-            doUsbPrintingAndRetry(promise, receiptWidth, lines, me, usbPathAddress, true);
+            doUsbPrintingAndRetry(curUsbConnect, promise, receiptWidth, lines, me, usbPathAddress, true);
         } else {
             // Trigger print now.
             synchronized (lockPrintingAsync) {
-                doPrintingService(me, lines, receiptWidth, promise);
+                doPrintingService(curUsbConnect, me, lines, receiptWidth, promise);
             }
         }
     }
@@ -244,14 +233,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        try {
-            if (XprinterModule.curUsbConnectLabelPrinting != null) {
-                XprinterModule.curUsbConnectLabelPrinting.close();
-            }
-        } catch (Exception ex) {
-
-        }
-        XprinterModule.curUsbConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
+        IDeviceConnection curUsbConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
         needToReconnect = true;
 
         String usbPathAddress = "";
@@ -280,37 +262,37 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             return;
         }
         if (needToReconnect) {
-            doUsbLabelPrintingAndRetry(promise, receiptWidth, lines, me, usbPathAddress, true);
+            doUsbLabelPrintingAndRetry(curUsbConnectLabelPrinting, promise, receiptWidth, lines, me, usbPathAddress, true);
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(me, lines, receiptWidth, promise);
+                doPrintingService(curUsbConnectLabelPrinting, me, lines, receiptWidth, promise);
             }
         }
     }
 
-    private static void doUsbLabelPrintingAndRetry(Promise promise, int receiptWidth, List<PrinterLine> lines,
+    private static void doUsbLabelPrintingAndRetry(IDeviceConnection curUsbConnectLabelPrinting, Promise promise, int receiptWidth, List<PrinterLine> lines,
                                                    ReactApplicationContext me, String usbPathAddress, boolean retryIfFailed) {
-        XprinterModule.curUsbConnectLabelPrinting.connect(usbPathAddress, new IPOSListener() {
+        curUsbConnectLabelPrinting.connect(usbPathAddress, new IPOSListener() {
             @Override
             public void onStatus(int i, String s) {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingLabelAsync) {
-                            doPrintingService(me, lines, receiptWidth, promise);
+                            doPrintingService(curUsbConnectLabelPrinting, me, lines, receiptWidth, promise);
                         }
                         break;
                     }
                     default: {
                         if (retryIfFailed) {
                             try {
-                                if (XprinterModule.curUsbConnectLabelPrinting != null) {
-                                    XprinterModule.curUsbConnectLabelPrinting.close();
+                                if (curUsbConnectLabelPrinting != null) {
+                                    curUsbConnectLabelPrinting.close();
                                 }
                             } catch (Exception ex) {
 
                             }
-                            doUsbLabelPrintingAndRetry(promise, receiptWidth, lines, me, usbPathAddress, false);
+                            doUsbLabelPrintingAndRetry(curUsbConnectLabelPrinting, promise, receiptWidth, lines, me, usbPathAddress, false);
                         }
                         break;
                     }
@@ -320,28 +302,28 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         });
     }
 
-    private static void doUsbPrintingAndRetry(Promise promise, int receiptWidth, List<PrinterLine> lines,
+    private static void doUsbPrintingAndRetry(IDeviceConnection curUsbConnect, Promise promise, int receiptWidth, List<PrinterLine> lines,
                                               ReactApplicationContext me, String usbPathAddress, boolean retryIfFailed) {
-        XprinterModule.curUsbConnect.connect(usbPathAddress, new IPOSListener() {
+        curUsbConnect.connect(usbPathAddress, new IPOSListener() {
             @Override
             public void onStatus(int i, String s) {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingAsync) {
-                            doPrintingService(me, lines, receiptWidth, promise);
+                            doPrintingService(curUsbConnect, me, lines, receiptWidth, promise);
                         }
                         break;
                     }
                     default: {
                         if (retryIfFailed) {
                             try {
-                                if (XprinterModule.curUsbConnect != null) {
-                                    XprinterModule.curUsbConnect.close();
+                                if (curUsbConnect != null) {
+                                    curUsbConnect.close();
                                 }
                             } catch (Exception ex) {
 
                             }
-                            doUsbPrintingAndRetry(promise, receiptWidth, lines, me, usbPathAddress, false);
+                            doUsbPrintingAndRetry(curUsbConnect, promise, receiptWidth, lines, me, usbPathAddress, false);
                         }
                         break;
                     }
@@ -363,22 +345,15 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        try {
-            if (XprinterModule.curBluetoothConnect != null) {
-                XprinterModule.curBluetoothConnect.close();
-            }
-        } catch (Exception ex) {
-
-        }
-        XprinterModule.curBluetoothConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
+        IDeviceConnection curBluetoothConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
         needToReconnect = true;
 
         if (needToReconnect) {
-            doBluetoothPrintingAndRetry(macAddress, promise, receiptWidth, lines, me, true);
+            doBluetoothPrintingAndRetry(curBluetoothConnect, macAddress, promise, receiptWidth, lines, me, true);
         } else {
             // Trigger print now.
             synchronized (lockPrintingAsync) {
-                doPrintingService(me, lines, receiptWidth, promise);
+                doPrintingService(curBluetoothConnect, me, lines, receiptWidth, promise);
             }
         }
     }
@@ -395,47 +370,40 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        try {
-            if (XprinterModule.curBluetoothConnectLabelPrinting != null) {
-                XprinterModule.curBluetoothConnectLabelPrinting.close();
-            }
-        } catch (Exception ex) {
-
-        }
-        XprinterModule.curBluetoothConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
+        IDeviceConnection curBluetoothConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
         needToReconnect = true;
 
         if (needToReconnect) {
-            doLabelBluetoothPrintingAndRetry(macAddress, promise, receiptWidth, lines, me, true);
+            doLabelBluetoothPrintingAndRetry(curBluetoothConnectLabelPrinting, macAddress, promise, receiptWidth, lines, me, true);
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(me, lines, receiptWidth, promise);
+                doPrintingService(curBluetoothConnectLabelPrinting, me, lines, receiptWidth, promise);
             }
         }
     }
 
-    private static void doLabelBluetoothPrintingAndRetry(String macAddress, Promise promise, int receiptWidth, List<PrinterLine> lines, ReactApplicationContext me, boolean retryIfFailed) {
-        XprinterModule.curBluetoothConnectLabelPrinting.connect(macAddress, new IPOSListener() {
+    private static void doLabelBluetoothPrintingAndRetry(IDeviceConnection curBluetoothConnectLabelPrinting, String macAddress, Promise promise, int receiptWidth, List<PrinterLine> lines, ReactApplicationContext me, boolean retryIfFailed) {
+        curBluetoothConnectLabelPrinting.connect(macAddress, new IPOSListener() {
             @Override
             public void onStatus(int i, String s) {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingLabelAsync) {
-                            doPrintingService(me, lines, receiptWidth, promise);
+                            doPrintingService(curBluetoothConnectLabelPrinting, me, lines, receiptWidth, promise);
                         }
                         break;
                     }
                     default: {
                         if (retryIfFailed) {
                             try {
-                                if (XprinterModule.curBluetoothConnectLabelPrinting != null) {
-                                    XprinterModule.curBluetoothConnectLabelPrinting.close();
+                                if (curBluetoothConnectLabelPrinting != null) {
+                                    curBluetoothConnectLabelPrinting.close();
                                 }
                             } catch (Exception ex) {
 
                             }
-                            doLabelBluetoothPrintingAndRetry(macAddress, promise, receiptWidth, lines, me, false);
+                            doLabelBluetoothPrintingAndRetry(curBluetoothConnectLabelPrinting, macAddress, promise, receiptWidth, lines, me, false);
                         }
                         break;
                     }
@@ -445,28 +413,28 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         });
     }
 
-    private static void doBluetoothPrintingAndRetry(String macAddress, Promise promise, int receiptWidth,
+    private static void doBluetoothPrintingAndRetry(IDeviceConnection curBluetoothConnect, String macAddress, Promise promise, int receiptWidth,
                                                     List<PrinterLine> lines, ReactApplicationContext me, boolean retryIfFailed) {
-        XprinterModule.curBluetoothConnect.connect(macAddress, new IPOSListener() {
+        curBluetoothConnect.connect(macAddress, new IPOSListener() {
             @Override
             public void onStatus(int i, String s) {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingAsync) {
-                            doPrintingService(me, lines, receiptWidth, promise);
+                            doPrintingService(curBluetoothConnect, me, lines, receiptWidth, promise);
                         }
                         break;
                     }
                     default: {
                         if (retryIfFailed) {
                             try {
-                                if (XprinterModule.curBluetoothConnect != null) {
-                                    XprinterModule.curBluetoothConnect.close();
+                                if (curBluetoothConnect != null) {
+                                    curBluetoothConnect.close();
                                 }
                             } catch (Exception ex) {
 
                             }
-                            doBluetoothPrintingAndRetry(macAddress, promise, receiptWidth, lines, me, false);
+                            doBluetoothPrintingAndRetry(curBluetoothConnect, macAddress, promise, receiptWidth, lines, me, false);
                         }
                         break;
                     }
@@ -488,22 +456,15 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        try {
-            if (XprinterModule.curEthernetConnect != null) {
-                XprinterModule.curEthernetConnect.close();
-            }
-        } catch (Exception ex) {
-
-        }
-        XprinterModule.curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+        IDeviceConnection curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
         needToReconnect = true;
 
         if (needToReconnect) {
-            doTcpPrintingAndRetry(ipAddress, promise, receiptWidth, lines, me, true);
+            doTcpPrintingAndRetry(curEthernetConnect, ipAddress, promise, receiptWidth, lines, me, true);
         } else {
             // Trigger print now.
             synchronized (lockPrintingAsync) {
-                doPrintingService(me, lines, receiptWidth, promise);
+                doPrintingService(curEthernetConnect, me, lines, receiptWidth, promise);
             }
         }
     }
@@ -520,47 +481,40 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        try {
-            if (XprinterModule.curEthernetConnectLabelPrinting != null) {
-                XprinterModule.curEthernetConnectLabelPrinting.close();
-            }
-        } catch (Exception ex) {
-
-        }
-        XprinterModule.curEthernetConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+        IDeviceConnection curEthernetConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
         needToReconnect = true;
 
         if (needToReconnect) {
-            doLabelTcpPrintingAndRetry(ipAddress, promise, receiptWidth, lines, me, true);
+            doLabelTcpPrintingAndRetry(curEthernetConnectLabelPrinting, ipAddress, promise, receiptWidth, lines, me, true);
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(me, lines, receiptWidth, promise);
+                doPrintingService(curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise);
             }
         }
     }
 
-    private static void doLabelTcpPrintingAndRetry(String ipAddress, Promise promise, int receiptWidth, List<PrinterLine> lines, ReactApplicationContext me, boolean retryIfFailed) {
-        XprinterModule.curEthernetConnectLabelPrinting.connect(ipAddress, new IPOSListener() {
+    private static void doLabelTcpPrintingAndRetry(IDeviceConnection curEthernetConnectLabelPrinting, String ipAddress, Promise promise, int receiptWidth, List<PrinterLine> lines, ReactApplicationContext me, boolean retryIfFailed) {
+        curEthernetConnectLabelPrinting.connect(ipAddress, new IPOSListener() {
             @Override
             public void onStatus(int i, String s) {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingLabelAsync) {
-                            doPrintingService(me, lines, receiptWidth, promise);
+                            doPrintingService(curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise);
                         }
                         break;
                     }
                     default: {
                         if (retryIfFailed) {
                             try {
-                                if (XprinterModule.curEthernetConnectLabelPrinting != null) {
-                                    XprinterModule.curEthernetConnectLabelPrinting.close();
+                                if (curEthernetConnectLabelPrinting != null) {
+                                    curEthernetConnectLabelPrinting.close();
                                 }
                             } catch (Exception ex) {
 
                             }
-                            doLabelTcpPrintingAndRetry(ipAddress, promise, receiptWidth, lines, me, false);
+                            doLabelTcpPrintingAndRetry(curEthernetConnectLabelPrinting, ipAddress, promise, receiptWidth, lines, me, false);
                         }
                         break;
                     }
@@ -570,27 +524,27 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         });
     }
 
-    private static void doTcpPrintingAndRetry(String ipAddress, Promise promise, int receiptWidth, List<PrinterLine> lines, ReactApplicationContext me, boolean retryIfFailed) {
-        XprinterModule.curEthernetConnect.connect(ipAddress, new IPOSListener() {
+    private static void doTcpPrintingAndRetry(IDeviceConnection curEthernetConnect, String ipAddress, Promise promise, int receiptWidth, List<PrinterLine> lines, ReactApplicationContext me, boolean retryIfFailed) {
+        curEthernetConnect.connect(ipAddress, new IPOSListener() {
             @Override
             public void onStatus(int i, String s) {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingAsync) {
-                            doPrintingService(me, lines, receiptWidth, promise);
+                            doPrintingService(curEthernetConnect, me, lines, receiptWidth, promise);
                         }
                         break;
                     }
                     default: {
                         if (retryIfFailed) {
                             try {
-                                if (XprinterModule.curEthernetConnect != null) {
-                                    XprinterModule.curEthernetConnect.close();
+                                if (curEthernetConnect != null) {
+                                    curEthernetConnect.close();
                                 }
                             } catch (Exception ex) {
 
                             }
-                            doTcpPrintingAndRetry(ipAddress, promise, receiptWidth, lines, me, false);
+                            doTcpPrintingAndRetry(curEthernetConnect, ipAddress, promise, receiptWidth, lines, me, false);
                         }
                         break;
                     }
@@ -600,9 +554,10 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         });
     }
 
-    private static void doPrintingService(ReactApplicationContext me, List<PrinterLine> lines, int receiptWidth, Promise promise) {
+    private static void doPrintingService(IDeviceConnection deviceConnection, ReactApplicationContext me,
+                                          List<PrinterLine> lines, int receiptWidth, Promise promise) {
         try {
-            POSPrinter printer = new POSPrinter(XprinterModule.curEthernetConnect);
+            POSPrinter printer = new POSPrinter(deviceConnection);
             printer.initializePrinter();
             try {
                 int marginDefault = 0;
