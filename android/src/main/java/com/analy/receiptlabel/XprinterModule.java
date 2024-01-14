@@ -32,7 +32,9 @@ import net.posprinter.service.PosprinterService;
 import android.hardware.usb.UsbConstants;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +57,10 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     private Set<BluetoothDevice> mPairedDevices;
 
     private static IDeviceConnection curEthernetConnect = null;
+    private static final Object lockEthernet = new Object();
+    private static final Object lockBluetooth = new Object();
+    private static final Object lockUsb = new Object();
+
     private static IDeviceConnection curBluetoothConnect = null;
 
     private static IDeviceConnection curUsbConnect = null;
@@ -63,6 +69,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     private static IDeviceConnection curBluetoothConnectLabelPrinting = null;
 
     private static IDeviceConnection curUsbConnectLabelPrinting = null;
+    private static final Object lockEthernetLabelPrinting = new Object();
+    private static final Object lockBluetoothLabelPrinting = new Object();
+    private static final Object lockUsbLabelPrinting = new Object();
 
     // bindService connection
     ServiceConnection conn = new ServiceConnection() {
@@ -101,66 +110,84 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void printTcp80mm(String ipAddress, int port, String payload, final Promise promise) {
-        int receiptWidth = 574;
-        printTcp(ipAddress, port, payload, promise, receiptWidth);
+        synchronized (lockEthernet) {
+            int receiptWidth = 574;
+            printTcp(ipAddress, port, payload, promise, receiptWidth, this.context);
+        }
     }
 
     @ReactMethod
     public void printTcp58mm(String ipAddress, int port, String payload, final Promise promise) {
-        int receiptWidth = 408;
-        printTcp(ipAddress, port, payload, promise, receiptWidth);
+        synchronized (lockEthernet) {
+            int receiptWidth = 408;
+            printTcp(ipAddress, port, payload, promise, receiptWidth, this.context);
+        }
     }
 
     @ReactMethod
     public void printLabelTcp(String ipAddress, int port, String payload, final Promise promise) {
-        int receiptWidth = 408;
-        printLabelTcp(ipAddress, port, payload, promise, receiptWidth);
+        synchronized (lockEthernetLabelPrinting) {
+            int receiptWidth = 408;
+            printLabelTcp(ipAddress, port, payload, promise, receiptWidth, this.context);
+        }
     }
 
 
     @ReactMethod
     public void printBluetooth80mm(String macAddress, String payload, final Promise promise) {
-        int receiptWidth = 574;
-        printBluetooth(macAddress, payload, promise, receiptWidth);
+        synchronized (lockBluetooth) {
+            int receiptWidth = 574;
+            printBluetooth(macAddress, payload, promise, receiptWidth, this.context);
+        }
     }
 
     @ReactMethod
     public void printBluetooth58mm(String macAddress, String payload, final Promise promise) {
-        int receiptWidth = 408;
-        printBluetooth(macAddress, payload, promise, receiptWidth);
+        synchronized (lockBluetooth) {
+            int receiptWidth = 408;
+            printBluetooth(macAddress, payload, promise, receiptWidth, this.context);
+        }
     }
 
     @ReactMethod
     public void printLabelBluetooth(String macAddress, String payload, final Promise promise) {
-        int receiptWidth = 408;
-        printLabelBluetooth(macAddress, payload, promise, receiptWidth);
+        synchronized (lockBluetoothLabelPrinting) {
+            int receiptWidth = 408;
+            printLabelBluetooth(macAddress, payload, promise, receiptWidth, this.context);
+        }
     }
 
     @ReactMethod
     public void printUsb80mm(String payload, final Promise promise) {
-        int receiptWidth = 574;
-        printUsb(payload, promise, receiptWidth);
+        synchronized (lockUsb) {
+            int receiptWidth = 574;
+            printUsb(payload, promise, receiptWidth, this.context);
+        }
     }
 
     @ReactMethod
     public void printUsb58mm(String payload, final Promise promise) {
-        int receiptWidth = 408;
-        printUsb(payload, promise, receiptWidth);
+        synchronized (lockUsb) {
+            int receiptWidth = 408;
+            printUsb(payload, promise, receiptWidth, this.context);
+        }
     }
 
     @ReactMethod
     public void printLabelUsb(String payload, final Promise promise) {
-        int receiptWidth = 408;
-        printLabelUsb(payload, promise, receiptWidth);
+        synchronized (lockUsbLabelPrinting) {
+            int receiptWidth = 408;
+            printLabelUsb(payload, promise, receiptWidth, this.context);
+        }
     }
 
-    private void printUsb(String payload, Promise promise, int receiptWidth) {
+    private static void printUsb(String payload, Promise promise, int receiptWidth, ReactApplicationContext context) {
         if (StringUtils.isBlank(payload)) {
             promise.reject("-1", "Should provide valid pageLoad to print");
             return;
         }
         List<PrinterLine> lines = parsePayload(payload);
-        ReactApplicationContext me = this.context;
+        ReactApplicationContext me = context;
         boolean needToReconnect = false;
         try {
             if (XprinterModule.curUsbConnect != null) {
@@ -205,13 +232,13 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private void printLabelUsb(String payload, Promise promise, int receiptWidth) {
+    private static void printLabelUsb(String payload, Promise promise, int receiptWidth, ReactApplicationContext context) {
         if (StringUtils.isBlank(payload)) {
             promise.reject("-1", "Should provide valid pageLoad to print");
             return;
         }
         List<PrinterLine> lines = parsePayload(payload);
-        ReactApplicationContext me = this.context;
+        ReactApplicationContext me = context;
         boolean needToReconnect = false;
         try {
             if (XprinterModule.curUsbConnectLabelPrinting != null) {
@@ -314,7 +341,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         });
     }
 
-    private void printBluetooth(String macAddress, String payload, Promise promise, int receiptWidth) {
+    private static void printBluetooth(String macAddress, String payload, Promise promise, int receiptWidth, ReactApplicationContext context) {
         if (StringUtils.isBlank(macAddress) ) {
             promise.reject("-1", "Should provide valid mac address");
             return;
@@ -324,7 +351,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             return;
         }
         List<PrinterLine> lines = parsePayload(payload);
-        ReactApplicationContext me = this.context;
+        ReactApplicationContext me = context;
         boolean needToReconnect = false;
         try {
             if (XprinterModule.curBluetoothConnect != null) {
@@ -344,7 +371,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private void printLabelBluetooth(String macAddress, String payload, Promise promise, int receiptWidth) {
+    private static void printLabelBluetooth(String macAddress, String payload, Promise promise, int receiptWidth, ReactApplicationContext context) {
         if (StringUtils.isBlank(macAddress)) {
             promise.reject("-1", "Should provide valid mac address");
             return;
@@ -354,7 +381,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             return;
         }
         List<PrinterLine> lines = parsePayload(payload);
-        ReactApplicationContext me = this.context;
+        ReactApplicationContext me = context;
         boolean needToReconnect = false;
         try {
             if (XprinterModule.curBluetoothConnectLabelPrinting != null) {
@@ -431,7 +458,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         });
     }
 
-    private void printTcp(String ipAddress, int port, String payload, Promise promise, int receiptWidth) {
+    private static void printTcp(String ipAddress, int port, String payload, Promise promise, int receiptWidth, ReactApplicationContext context) {
         if (StringUtils.isBlank(ipAddress) || port <= 0) {
             promise.reject("-1", "Should provide valid ip address");
             return;
@@ -441,7 +468,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             return;
         }
         List<PrinterLine> lines = parsePayload(payload);
-        ReactApplicationContext me = this.context;
+        ReactApplicationContext me = context;
         boolean needToReconnect = false;
         try {
             if (XprinterModule.curEthernetConnect != null) {
@@ -461,7 +488,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private void printLabelTcp(String ipAddress, int port, String payload, Promise promise, int receiptWidth) {
+    private static void printLabelTcp(String ipAddress, int port, String payload, Promise promise, int receiptWidth, ReactApplicationContext context) {
         if (StringUtils.isBlank(ipAddress) || port <= 0) {
             promise.reject("-1", "Should provide valid ip address");
             return;
@@ -471,7 +498,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             return;
         }
         List<PrinterLine> lines = parsePayload(payload);
-        ReactApplicationContext me = this.context;
+        ReactApplicationContext me = context;
         boolean needToReconnect = false;
         try {
             if (XprinterModule.curEthernetConnectLabelPrinting != null) {
@@ -598,7 +625,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private List<PrinterLine> parsePayload(String payload) {
+    private static List<PrinterLine> parsePayload(String payload) {
         List<PrinterLine> lines = new ArrayList<>();
         String[] payloadItems = payload.split("@@NL@@");
         for (String payloadLine : payloadItems) {
