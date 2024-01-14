@@ -29,7 +29,9 @@ import net.posprinter.POSConst;
 import net.posprinter.POSPrinter;
 import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.service.PosprinterService;
+
 import android.hardware.usb.UsbConstants;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -38,6 +40,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 
@@ -61,14 +64,18 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     private static final Object lockBluetooth = new Object();
     private static final Object lockUsb = new Object();
 
-    private static IDeviceConnection curBluetoothConnect = null;
-
-    private static IDeviceConnection curUsbConnect = null;
-
     private static final Object lockEthernetLabelPrinting = new Object();
     private static final Object lockBluetoothLabelPrinting = new Object();
     private static final Object lockUsbLabelPrinting = new Object();
     private static final Object lockPrintingLabelAsync = new Object();
+    private static IDeviceConnection curEthernetConnect = null;
+    private static IDeviceConnection curBluetoothConnect = null;
+    private static IDeviceConnection curUsbConnect = null;
+
+    private static IDeviceConnection curEthernetConnectLabelPrinting = null;
+    private static IDeviceConnection curBluetoothConnectLabelPrinting = null;
+    private static IDeviceConnection curUsbConnectLabelPrinting = null;
+
 
     // bindService connection
     ServiceConnection conn = new ServiceConnection() {
@@ -187,53 +194,15 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
 
-        IDeviceConnection curUsbConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
-        needToReconnect = true;
+        try {
+            if (XprinterModule.curUsbConnect != null) {
+                XprinterModule.curUsbConnect.close();
+                Thread.sleep(200);
+            }
+        } catch (Exception ex) {
 
-        String usbPathAddress = "";
-        UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
-        if (usbManager == null) {
-            promise.reject("-1", "Can not connect to usb printer");
-            return;
         }
-        Collection<UsbDevice> devicesList = usbManager.getDeviceList().values();
-        if (devicesList == null || devicesList.size() == 0) {
-            promise.reject("-1", "Can not connect to usb printer");
-            return;
-        }
-        for (UsbDevice device : devicesList) {
-            int usbClass = device.getDeviceClass();
-            if((usbClass == UsbConstants.USB_CLASS_PER_INTERFACE || usbClass == UsbConstants.USB_CLASS_MISC ) && UsbDeviceHelper.findPrinterInterface(device) != null) {
-                usbClass = UsbConstants.USB_CLASS_PRINTER;
-            }
-            if (usbClass == UsbConstants.USB_CLASS_PRINTER) {
-                usbPathAddress = device.getDeviceName();
-                break;
-            }
-        }
-        if (StringUtils.isBlank(usbPathAddress)) {
-            promise.reject("-1", "Can not connect to usb printer");
-            return;
-        }
-        if (needToReconnect) {
-            doUsbPrintingAndRetry(curUsbConnect, promise, receiptWidth, lines, me, usbPathAddress, true);
-        } else {
-            // Trigger print now.
-            synchronized (lockPrintingAsync) {
-                doPrintingService(curUsbConnect, me, lines, receiptWidth, promise);
-            }
-        }
-    }
-
-    private static void printLabelUsb(String payload, Promise promise, int receiptWidth, ReactApplicationContext context) {
-        if (StringUtils.isBlank(payload)) {
-            promise.reject("-1", "Should provide valid pageLoad to print");
-            return;
-        }
-        List<PrinterLine> lines = parsePayload(payload);
-        ReactApplicationContext me = context;
-        boolean needToReconnect = false;
-        IDeviceConnection curUsbConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
+        XprinterModule.curUsbConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
         needToReconnect = true;
 
         String usbPathAddress = "";
@@ -262,11 +231,66 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             return;
         }
         if (needToReconnect) {
-            doUsbLabelPrintingAndRetry(curUsbConnectLabelPrinting, promise, receiptWidth, lines, me, usbPathAddress, true);
+            doUsbPrintingAndRetry(XprinterModule.curUsbConnect, promise, receiptWidth, lines, me, usbPathAddress, true);
+        } else {
+            // Trigger print now.
+            synchronized (lockPrintingAsync) {
+                doPrintingService(XprinterModule.curUsbConnect, me, lines, receiptWidth, promise);
+            }
+        }
+    }
+
+    private static void printLabelUsb(String payload, Promise promise, int receiptWidth, ReactApplicationContext context) {
+        if (StringUtils.isBlank(payload)) {
+            promise.reject("-1", "Should provide valid pageLoad to print");
+            return;
+        }
+        List<PrinterLine> lines = parsePayload(payload);
+        ReactApplicationContext me = context;
+        boolean needToReconnect = false;
+        try {
+            if (XprinterModule.curUsbConnectLabelPrinting != null) {
+                XprinterModule.curUsbConnectLabelPrinting.close();
+                Thread.sleep(200);
+            }
+        } catch (Exception ex) {
+
+        }
+        XprinterModule.curUsbConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_USB);
+
+        needToReconnect = true;
+
+        String usbPathAddress = "";
+        UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+        if (usbManager == null) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
+        Collection<UsbDevice> devicesList = usbManager.getDeviceList().values();
+        if (devicesList == null || devicesList.size() == 0) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
+        for (UsbDevice device : devicesList) {
+            int usbClass = device.getDeviceClass();
+            if ((usbClass == UsbConstants.USB_CLASS_PER_INTERFACE || usbClass == UsbConstants.USB_CLASS_MISC) && UsbDeviceHelper.findPrinterInterface(device) != null) {
+                usbClass = UsbConstants.USB_CLASS_PRINTER;
+            }
+            if (usbClass == UsbConstants.USB_CLASS_PRINTER) {
+                usbPathAddress = device.getDeviceName();
+                break;
+            }
+        }
+        if (StringUtils.isBlank(usbPathAddress)) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
+        if (needToReconnect) {
+            doUsbLabelPrintingAndRetry(XprinterModule.curUsbConnectLabelPrinting, promise, receiptWidth, lines, me, usbPathAddress, true);
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(curUsbConnectLabelPrinting, me, lines, receiptWidth, promise);
+                doPrintingService(XprinterModule.curUsbConnectLabelPrinting, me, lines, receiptWidth, promise);
             }
         }
     }
@@ -319,6 +343,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                             try {
                                 if (curUsbConnect != null) {
                                     curUsbConnect.close();
+                                    Thread.sleep(200);
                                 }
                             } catch (Exception ex) {
 
@@ -334,7 +359,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     }
 
     private static void printBluetooth(String macAddress, String payload, Promise promise, int receiptWidth, ReactApplicationContext context) {
-        if (StringUtils.isBlank(macAddress) ) {
+        if (StringUtils.isBlank(macAddress)) {
             promise.reject("-1", "Should provide valid mac address");
             return;
         }
@@ -345,15 +370,24 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        IDeviceConnection curBluetoothConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
+        try {
+            if (XprinterModule.curBluetoothConnect != null) {
+                XprinterModule.curBluetoothConnect.close();
+                Thread.sleep(200);
+            }
+        } catch (Exception ex) {
+
+        }
+        XprinterModule.curBluetoothConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
+
         needToReconnect = true;
 
         if (needToReconnect) {
-            doBluetoothPrintingAndRetry(curBluetoothConnect, macAddress, promise, receiptWidth, lines, me, true);
+            doBluetoothPrintingAndRetry(XprinterModule.curBluetoothConnect, macAddress, promise, receiptWidth, lines, me, true);
         } else {
             // Trigger print now.
             synchronized (lockPrintingAsync) {
-                doPrintingService(curBluetoothConnect, me, lines, receiptWidth, promise);
+                doPrintingService(XprinterModule.curBluetoothConnect, me, lines, receiptWidth, promise);
             }
         }
     }
@@ -370,7 +404,16 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        IDeviceConnection curBluetoothConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
+        try {
+            if (XprinterModule.curBluetoothConnectLabelPrinting != null) {
+                XprinterModule.curBluetoothConnectLabelPrinting.close();
+                Thread.sleep(200);
+            }
+        } catch (Exception ex) {
+
+        }
+        XprinterModule.curBluetoothConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_BLUETOOTH);
+
         needToReconnect = true;
 
         if (needToReconnect) {
@@ -430,6 +473,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                             try {
                                 if (curBluetoothConnect != null) {
                                     curBluetoothConnect.close();
+                                    Thread.sleep(200);
                                 }
                             } catch (Exception ex) {
 
@@ -456,7 +500,15 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        IDeviceConnection curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+        try {
+            if (XprinterModule.curEthernetConnect != null) {
+                XprinterModule.curEthernetConnect.close();
+                Thread.sleep(200);
+            }
+        } catch (Exception ex) {
+
+        }
+        XprinterModule.curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
         needToReconnect = true;
 
         if (needToReconnect) {
@@ -481,15 +533,23 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         List<PrinterLine> lines = parsePayload(payload);
         ReactApplicationContext me = context;
         boolean needToReconnect = false;
-        IDeviceConnection curEthernetConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+        try {
+            if (XprinterModule.curEthernetConnectLabelPrinting != null) {
+                XprinterModule.curEthernetConnectLabelPrinting.close();
+            }
+        } catch (Exception ex) {
+
+        }
+        XprinterModule.curEthernetConnectLabelPrinting = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
+
         needToReconnect = true;
 
         if (needToReconnect) {
-            doLabelTcpPrintingAndRetry(curEthernetConnectLabelPrinting, ipAddress, promise, receiptWidth, lines, me, true);
+            doLabelTcpPrintingAndRetry(XprinterModule.curEthernetConnectLabelPrinting, ipAddress, promise, receiptWidth, lines, me, true);
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise);
+                doPrintingService(XprinterModule.curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise);
             }
         }
     }
@@ -540,6 +600,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                             try {
                                 if (curEthernetConnect != null) {
                                     curEthernetConnect.close();
+                                    Thread.sleep(200);
                                 }
                             } catch (Exception ex) {
 
