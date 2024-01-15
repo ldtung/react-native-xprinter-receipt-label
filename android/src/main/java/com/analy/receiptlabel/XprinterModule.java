@@ -249,7 +249,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } else {
             // Trigger print now.
             synchronized (lockPrintingAsync) {
-                doPrintingService(XprinterModule.curUsbConnect, me, lines, receiptWidth, promise);
+                doPrintingService(XprinterModule.curUsbConnect, me, lines, receiptWidth, promise, false);
             }
         }
     }
@@ -310,7 +310,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(XprinterModule.curUsbConnectLabelPrinting, me, lines, receiptWidth, promise);
+                doPrintingService(XprinterModule.curUsbConnectLabelPrinting, me, lines, receiptWidth, promise, true);
             }
         }
     }
@@ -323,7 +323,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingLabelAsync) {
-                            doPrintingService(curUsbConnectLabelPrinting, me, lines, receiptWidth, promise);
+                            doPrintingService(curUsbConnectLabelPrinting, me, lines, receiptWidth, promise, true);
                         }
                         break;
                     }
@@ -354,7 +354,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingAsync) {
-                            doPrintingService(curUsbConnect, me, lines, receiptWidth, promise);
+                            doPrintingService(curUsbConnect, me, lines, receiptWidth, promise, false);
                         }
                         break;
                     }
@@ -411,7 +411,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } else {
             // Trigger print now.
             synchronized (lockPrintingAsync) {
-                doPrintingService(XprinterModule.curBluetoothConnect, me, lines, receiptWidth, promise);
+                doPrintingService(XprinterModule.curBluetoothConnect, me, lines, receiptWidth, promise, false);
             }
         }
     }
@@ -452,7 +452,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(curBluetoothConnectLabelPrinting, me, lines, receiptWidth, promise);
+                doPrintingService(curBluetoothConnectLabelPrinting, me, lines, receiptWidth, promise, true);
             }
         }
     }
@@ -464,7 +464,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingLabelAsync) {
-                            doPrintingService(curBluetoothConnectLabelPrinting, me, lines, receiptWidth, promise);
+                            doPrintingService(curBluetoothConnectLabelPrinting, me, lines, receiptWidth, promise, true);
                         }
                         break;
                     }
@@ -495,7 +495,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingAsync) {
-                            doPrintingService(curBluetoothConnect, me, lines, receiptWidth, promise);
+                            doPrintingService(curBluetoothConnect, me, lines, receiptWidth, promise, false);
                         }
                         break;
                     }
@@ -549,7 +549,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } else {
             // Trigger print now.
             synchronized (lockPrintingAsync) {
-                doPrintingService(curEthernetConnect, me, lines, receiptWidth, promise);
+                doPrintingService(curEthernetConnect, me, lines, receiptWidth, promise, false);
             }
         }
     }
@@ -589,7 +589,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(XprinterModule.curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise);
+                doPrintingService(XprinterModule.curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise, true);
             }
         }
     }
@@ -601,7 +601,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingLabelAsync) {
-                            doPrintingService(curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise);
+                            doPrintingService(curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise, true);
                         }
                         break;
                     }
@@ -631,7 +631,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingAsync) {
-                            doPrintingService(curEthernetConnect, me, lines, receiptWidth, promise);
+                            doPrintingService(curEthernetConnect, me, lines, receiptWidth, promise, false);
                         }
                         break;
                     }
@@ -655,7 +655,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     }
 
     private static void doPrintingService(IDeviceConnection deviceConnection, ReactApplicationContext me,
-                                          List<PrinterLine> lines, int receiptWidth, Promise promise) {
+                                          List<PrinterLine> lines, int receiptWidth, Promise promise, boolean isLabelPrinting) {
         try {
             POSPrinter printer = new POSPrinter(deviceConnection);
             printer.initializePrinter();
@@ -691,14 +691,18 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     }
                 }
                 Bitmap imageToPrint = receipt.build();
-                printer.feedLine(marginDefault);
+                if (!isLabelPrinting) {
+                    printer.feedLine(marginDefault);
+                }
                 printer.printBitmap(imageToPrint, POSConst.ALIGNMENT_CENTER, receiptWidth);
             } catch (Exception ex) {
                 promise.reject("-1", "Have error in preparing printing " + ex.getMessage());
                 return;
             }
-            printer.feedLine();
-            printer.cutHalfAndFeed(1);
+            if (!isLabelPrinting) {
+                printer.feedLine();
+                printer.cutHalfAndFeed(1);
+            }
             promise.resolve(true);
         } catch (Exception ex) {
             // Error while printing
