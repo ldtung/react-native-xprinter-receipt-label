@@ -140,7 +140,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printLabelTcp(String ipAddress, int port, String payload, final Promise promise) {
         synchronized (lockEthernetLabelPrinting) {
-            int receiptWidth = 408;
+            int receiptWidth = PRINTER_58mm_WIDTH;
             printLabelTcp(ipAddress, port, payload, promise, receiptWidth, this.context);
         }
     }
@@ -165,7 +165,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printLabelBluetooth(String macAddress, String payload, final Promise promise) {
         synchronized (lockBluetoothLabelPrinting) {
-            int receiptWidth = 408;
+            int receiptWidth = PRINTER_58mm_WIDTH;
             printLabelBluetooth(macAddress, payload, promise, receiptWidth, this.context);
         }
     }
@@ -189,7 +189,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printLabelUsb(String payload, final Promise promise) {
         synchronized (lockUsbLabelPrinting) {
-            int receiptWidth = 408;
+            int receiptWidth = PRINTER_58mm_WIDTH;
             printLabelUsb(payload, promise, receiptWidth, this.context);
         }
     }
