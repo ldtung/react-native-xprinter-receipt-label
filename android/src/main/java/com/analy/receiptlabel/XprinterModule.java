@@ -73,6 +73,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     private static IDeviceConnection curBluetoothConnect = null;
     private static IDeviceConnection curUsbConnect = null;
 
+    private static int PRINTER_80mm_WIDTH = 574;
+    private static int PRINTER_58mm_WIDTH = 368;
 
     // bindService connection
     ServiceConnection conn = new ServiceConnection() {
@@ -112,7 +114,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printTcp80mm(String ipAddress, int port, String payload, final Promise promise) {
         synchronized (lockEthernet) {
-            int receiptWidth = 574;
+            int receiptWidth = PRINTER_80mm_WIDTH;
             printTcp(ipAddress, port, payload, promise, receiptWidth, this.context);
         }
     }
@@ -120,7 +122,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printTcp58mm(String ipAddress, int port, String payload, final Promise promise) {
         synchronized (lockEthernet) {
-            int receiptWidth = 408;
+            int receiptWidth = PRINTER_58mm_WIDTH;
             printTcp(ipAddress, port, payload, promise, receiptWidth, this.context);
         }
     }
@@ -128,7 +130,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printBluetooth80mm(String macAddress, String payload, final Promise promise) {
         synchronized (lockBluetooth) {
-            int receiptWidth = 574;
+            int receiptWidth = PRINTER_80mm_WIDTH;
             printBluetooth(macAddress, payload, promise, receiptWidth, this.context);
         }
     }
@@ -136,7 +138,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printBluetooth58mm(String macAddress, String payload, final Promise promise) {
         synchronized (lockBluetooth) {
-            int receiptWidth = 408;
+            int receiptWidth = PRINTER_58mm_WIDTH;
             printBluetooth(macAddress, payload, promise, receiptWidth, this.context);
         }
     }
@@ -144,7 +146,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printUsb80mm(String payload, final Promise promise) {
         synchronized (lockUsb) {
-            int receiptWidth = 574;
+            int receiptWidth = PRINTER_80mm_WIDTH;
             printUsb(payload, promise, receiptWidth, this.context);
         }
     }
@@ -152,7 +154,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printUsb58mm(String payload, final Promise promise) {
         synchronized (lockUsb) {
-            int receiptWidth = 408;
+            int receiptWidth = PRINTER_58mm_WIDTH;
             printUsb(payload, promise, receiptWidth, this.context);
         }
     }
