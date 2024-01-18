@@ -741,6 +741,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     line.align = Paint.Align.CENTER;
                 } else if ("XL".equalsIgnoreCase(format)) {
                     line.textSize = 90F;
+                } else if ("BL".equalsIgnoreCase(format)) {
+                    line.textSize = 80F;
                 } else if ("L".equalsIgnoreCase(format)) {
                     line.textSize = 70F;
                 } else if ("T".equalsIgnoreCase(format)) {
@@ -764,10 +766,11 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         // B: Bold
         // R: Right
         // XL: Size big text
+        // BL: big large
         // L: Size medium text
         // T: Tiny text (for lable printer)
         // VT: Very tiny text
-        String[] letters = {"P", "S", "C", "B", "R", "XL", "L", "T", "VT"};
+        String[] letters = {"P", "S", "C", "B", "R", "XL", "L", "T", "VT", "BL"};
         String regexPattern = generateRegexPattern(letters);
         Pattern pattern = Pattern.compile(regexPattern);
         Matcher matcher = pattern.matcher(input);
