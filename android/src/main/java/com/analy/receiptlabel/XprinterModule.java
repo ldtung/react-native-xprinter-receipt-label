@@ -664,15 +664,15 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             try {
                 int marginDefault = 0;
                 int receiptBuilderWidth = 1200;
-                String fontRegular = "fonts/RobotoMono-Regular.ttf";
-                String fontBold = "fonts/RobotoMono-Bold.ttf";
+//                String fontRegular = "fonts/RobotoMono-Regular.ttf";
+//                String fontBold = "fonts/RobotoMono-Bold.ttf";
                 float defaultTextSize = 60F;
                 ReceiptBuilder receipt = new ReceiptBuilder(receiptBuilderWidth);
                 receipt.setMargin(marginDefault, marginDefault);
                 receipt.setAlign(Paint.Align.LEFT);
                 receipt.setColor(Color.BLACK);
                 receipt.setTextSize(defaultTextSize);
-                receipt.setTypeface(me, fontRegular);
+//                receipt.setTypeface(me, fontRegular);
                 for (PrinterLine line : lines) {
                     if (line.isNewLine) {
                         receipt.addLine();
@@ -682,7 +682,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                         continue;
                     }
 
-                    receipt.setTypeface(me, line.isBold ? fontBold : fontRegular);
+//                    receipt.setTypeface(me, line.isBold ? fontBold : fontRegular);
                     receipt.setMargin(marginDefault, marginDefault);
                     receipt.setTextSize(line.textSize != null ? line.textSize : defaultTextSize);
                     receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
@@ -696,7 +696,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 printer.sizeMm(50, 30.0)
                         .gapMm(2.0, 0.0)
                         .cls()
-                        .bitmap(0, 0, TSCConst.BMP_MODE_OVERWRITE, 400, imageToPrint).print(1);
+                        .bitmap(0, 5, TSCConst.BMP_MODE_OVERWRITE, 400, imageToPrint).print(1);
             } catch (Exception ex) {
                 promise.reject("-1", "Have error in preparing printing " + ex.getMessage());
                 return;
