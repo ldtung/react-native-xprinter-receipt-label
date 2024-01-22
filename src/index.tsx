@@ -21,6 +21,9 @@ type NativeModuleType = typeof NativeModules & {
       ip: string,
       port: number,
       payload: string,
+      labelWidth: number,
+      labelHeight: number,
+      labelGap: number,
     ): Promise<void>;
     printBluetooth80mm(
       macAddress: string,
@@ -33,6 +36,9 @@ type NativeModuleType = typeof NativeModules & {
     printLabelBluetooth(
       macAddress: string,
       payload: string,
+      labelWidth: number,
+      labelHeight: number,
+      labelGap: number,
     ): Promise<void>;
     printUsb80mm(
       payload: string,
@@ -42,6 +48,9 @@ type NativeModuleType = typeof NativeModules & {
     ): Promise<void>;
     printLabelUsb(
       payload: string,
+      labelWidth: number,
+      labelHeight: number,
+      labelGap: number,
     ): Promise<void>;
     getBluetoothDeviceList(): Promise<BluetoothPrinter[]>;
   };
@@ -52,6 +61,9 @@ const { RNXprinter }: NativeModuleType =
 
 interface PrinterInterface {
   payload: string;
+  labelWidth: number,
+  labelHeight: number,
+  labelGap: number,
 }
 
 interface PrintTcpInterface extends PrinterInterface {
@@ -68,6 +80,9 @@ let defaultConfig: PrintTcpInterface & PrintBluetoothInterface = {
   ip: '192.168.192.168',
   port: 9100,
   payload: '',
+  labelWidth: 50,
+  labelHeight: 30,
+  labelGap: 2
 };
 
 const getConfig = (
@@ -114,12 +129,18 @@ const printLabelTcp = async (
     ip,
     port,
     payload,
+    labelWidth,
+    labelHeight,
+    labelGap,
   } = getConfig(args);
 
   await RNXprinter.printLabelTcp(
     ip,
     port,
     payload,
+    labelWidth,
+    labelHeight,
+    labelGap,
     );
   };
 
@@ -157,11 +178,17 @@ const printLabelBluetooth = (
   const {
     macAddress,
     payload,
+    labelWidth,
+    labelHeight,
+    labelGap,
   } = getConfig(args);
 
   return RNXprinter.printLabelBluetooth(
     macAddress,
     payload,
+    labelWidth,
+    labelHeight,
+    labelGap,
   );
 };
 
@@ -194,10 +221,16 @@ const printLabelUsb = (
 ): Promise<void> => {
   const {
     payload,
+    labelWidth,
+    labelHeight,
+    labelGap,
   } = getConfig(args);
 
   return RNXprinter.printLabelUsb(
     payload,
+    labelWidth,
+    labelHeight,
+    labelGap,
   );
 };
 
