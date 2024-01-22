@@ -27,6 +27,7 @@ import net.posprinter.IPOSListener;
 import net.posprinter.POSConnect;
 import net.posprinter.POSConst;
 import net.posprinter.POSPrinter;
+import net.posprinter.TSCConst;
 import net.posprinter.TSCPrinter;
 import net.posprinter.ZPLPrinter;
 import net.posprinter.posprinterface.IMyBinder;
@@ -693,9 +694,9 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 }
                 Bitmap imageToPrint = receipt.build();
                 printer.sizeMm(50, 30.0)
-                        .gapMm(0.0, 0.0)
+                        .gapMm(2.0, 0.0)
                         .cls()
-                        .bitmap(0, 0, 0, 50, imageToPrint).print();
+                        .bitmap(0, 0, TSCConst.BMP_MODE_OVERWRITE, 400, imageToPrint).print(1);
             } catch (Exception ex) {
                 promise.reject("-1", "Have error in preparing printing " + ex.getMessage());
                 return;
