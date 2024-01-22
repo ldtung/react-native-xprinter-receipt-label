@@ -27,6 +27,8 @@ import net.posprinter.IPOSListener;
 import net.posprinter.POSConnect;
 import net.posprinter.POSConst;
 import net.posprinter.POSPrinter;
+import net.posprinter.TSCPrinter;
+import net.posprinter.ZPLPrinter;
 import net.posprinter.posprinterface.IMyBinder;
 import net.posprinter.service.PosprinterService;
 
@@ -310,7 +312,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(XprinterModule.curUsbConnectLabelPrinting, me, lines, receiptWidth, promise, true);
+                doPrintingLabelService(XprinterModule.curUsbConnectLabelPrinting, me, lines, receiptWidth, promise, true);
             }
         }
     }
@@ -323,7 +325,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingLabelAsync) {
-                            doPrintingService(curUsbConnectLabelPrinting, me, lines, receiptWidth, promise, true);
+                            doPrintingLabelService(curUsbConnectLabelPrinting, me, lines, receiptWidth, promise, true);
                         }
                         break;
                     }
@@ -452,7 +454,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(curBluetoothConnectLabelPrinting, me, lines, receiptWidth, promise, true);
+                doPrintingLabelService(curBluetoothConnectLabelPrinting, me, lines, receiptWidth, promise, true);
             }
         }
     }
@@ -464,7 +466,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingLabelAsync) {
-                            doPrintingService(curBluetoothConnectLabelPrinting, me, lines, receiptWidth, promise, true);
+                            doPrintingLabelService(curBluetoothConnectLabelPrinting, me, lines, receiptWidth, promise, true);
                         }
                         break;
                     }
@@ -589,7 +591,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } else {
             // Trigger print now.
             synchronized (lockPrintingLabelAsync) {
-                doPrintingService(XprinterModule.curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise, true);
+                doPrintingLabelService(XprinterModule.curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise, true);
             }
         }
     }
@@ -601,7 +603,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 switch (i) {
                     case POSConnect.CONNECT_SUCCESS: {
                         synchronized (lockPrintingLabelAsync) {
-                            doPrintingService(curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise, true);
+                            doPrintingLabelService(curEthernetConnectLabelPrinting, me, lines, receiptWidth, promise, true);
                         }
                         break;
                     }
@@ -652,6 +654,57 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 
             }
         });
+    }
+
+    private static void doPrintingLabelService(IDeviceConnection deviceConnection, ReactApplicationContext me,
+                                          List<PrinterLine> lines, int receiptWidth, Promise promise, boolean isLabelPrinting) {
+        try {
+            TSCPrinter printer = new TSCPrinter(deviceConnection);
+            try {
+                int marginDefault = 0;
+                int receiptBuilderWidth = 1200;
+                String fontRegular = "fonts/RobotoMono-Regular.ttf";
+                String fontBold = "fonts/RobotoMono-Bold.ttf";
+                float defaultTextSize = 60F;
+                ReceiptBuilder receipt = new ReceiptBuilder(receiptBuilderWidth);
+                receipt.setMargin(marginDefault, marginDefault);
+                receipt.setAlign(Paint.Align.LEFT);
+                receipt.setColor(Color.BLACK);
+                receipt.setTextSize(defaultTextSize);
+                receipt.setTypeface(me, fontRegular);
+                for (PrinterLine line : lines) {
+                    if (line.isNewLine) {
+                        receipt.addLine();
+                        continue;
+                    } else if (line.isParagraph) {
+                        receipt.addParagraph();
+                        continue;
+                    }
+
+                    receipt.setTypeface(me, line.isBold ? fontBold : fontRegular);
+                    receipt.setMargin(marginDefault, marginDefault);
+                    receipt.setTextSize(line.textSize != null ? line.textSize : defaultTextSize);
+                    receipt.setAlign(line.align != null ? line.align : Paint.Align.LEFT);
+                    receipt.setColor(line.textColor != null ? line.textColor : Color.BLACK);
+                    receipt.addText(line.text, !line.isSameLine);
+                    if (!line.isSameLine && line.textSize != null && line.textSize > defaultTextSize) {
+                        receipt.addBlankSpace(15);
+                    }
+                }
+                Bitmap imageToPrint = receipt.build();
+                printer.sizeMm(50, 30.0)
+                        .gapMm(0.0, 0.0)
+                        .cls()
+                        .bitmap(0, 0, 0, 50, imageToPrint).print();
+            } catch (Exception ex) {
+                promise.reject("-1", "Have error in preparing printing " + ex.getMessage());
+                return;
+            }
+            promise.resolve(true);
+        } catch (Exception ex) {
+            // Error while printing
+            promise.reject("-1", "There is an error while printing " + ex.getMessage());
+        }
     }
 
     private static void doPrintingService(IDeviceConnection deviceConnection, ReactApplicationContext me,
