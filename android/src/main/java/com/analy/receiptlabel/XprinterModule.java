@@ -220,9 +220,25 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
 
         String usbPathAddress = "";
-        List<String> usbDevices = POSConnect.getUsbDevices(context);
-        if (usbDevices != null && usbDevices.size() > 0) {
-            usbPathAddress = usbDevices.get(0);
+        UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+        if (usbManager == null) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
+        Collection<UsbDevice> devicesList = usbManager.getDeviceList().values();
+        if (devicesList == null || devicesList.size() == 0) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
+        for (UsbDevice device : devicesList) {
+            int usbClass = device.getDeviceClass();
+            if ((usbClass == UsbConstants.USB_CLASS_PER_INTERFACE || usbClass == UsbConstants.USB_CLASS_MISC) && UsbDeviceHelper.findPrinterInterface(device) != null) {
+                usbClass = UsbConstants.USB_CLASS_PRINTER;
+            }
+            if (usbClass == UsbConstants.USB_CLASS_PRINTER) {
+                usbPathAddress = device.getDeviceName();
+                break;
+            }
         }
         if (StringUtils.isBlank(usbPathAddress)) {
             promise.reject("-1", "Can not connect to usb printer");
@@ -265,9 +281,25 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
 
         String usbPathAddress = "";
-        List<String> usbDevices = POSConnect.getUsbDevices(context);
-        if (usbDevices != null && usbDevices.size() > 0) {
-            usbPathAddress = usbDevices.get(0);
+        UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+        if (usbManager == null) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
+        Collection<UsbDevice> devicesList = usbManager.getDeviceList().values();
+        if (devicesList == null || devicesList.size() == 0) {
+            promise.reject("-1", "Can not connect to usb printer");
+            return;
+        }
+        for (UsbDevice device : devicesList) {
+            int usbClass = device.getDeviceClass();
+            if ((usbClass == UsbConstants.USB_CLASS_PER_INTERFACE || usbClass == UsbConstants.USB_CLASS_MISC) && UsbDeviceHelper.findPrinterInterface(device) != null) {
+                usbClass = UsbConstants.USB_CLASS_PRINTER;
+            }
+            if (usbClass == UsbConstants.USB_CLASS_PRINTER) {
+                usbPathAddress = device.getDeviceName();
+                break;
+            }
         }
         if (StringUtils.isBlank(usbPathAddress)) {
             promise.reject("-1", "Can not connect to usb printer");
