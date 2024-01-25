@@ -204,29 +204,29 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void printUsb80mm(String payload, final Promise promise) {
+    public void printUsb80mm(String payload, String usbDeviceName, final Promise promise) {
         synchronized (lockUsb) {
             int receiptWidth = PRINTER_80mm_WIDTH;
-            printUsb(payload, promise, receiptWidth, this.context);
+            printUsb(payload, promise, usbDeviceName, receiptWidth, this.context);
         }
     }
 
     @ReactMethod
-    public void printUsb58mm(String payload, final Promise promise) {
+    public void printUsb58mm(String payload, String usbDeviceName, final Promise promise) {
         synchronized (lockUsb) {
             int receiptWidth = PRINTER_58mm_WIDTH;
-            printUsb(payload, promise, receiptWidth, this.context);
+            printUsb(payload, promise, usbDeviceName, receiptWidth, this.context);
         }
     }
 
     @ReactMethod
-    public void printLabelUsb(String payload, int labelWidth, int labelHeight, int labelGap, final Promise promise) {
+    public void printLabelUsb(String payload, String usbDeviceName, int labelWidth, int labelHeight, int labelGap, final Promise promise) {
         synchronized (lockUsbLabelPrinting) {
-            printLabelUsb(payload, promise, labelWidth, labelHeight, labelGap, this.context);
+                printLabelUsb(payload, promise, usbDeviceName, labelWidth, labelHeight, labelGap, this.context);
         }
     }
 
-    private static void printUsb(String payload, Promise promise, int receiptWidth, ReactApplicationContext context) {
+    private static void printUsb(String payload, Promise promise, String usbDeviceName, int receiptWidth, ReactApplicationContext context) {
         if (StringUtils.isBlank(payload)) {
             promise.reject("-1", "Should provide valid pageLoad to print");
             return;
@@ -267,7 +267,12 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             if ((usbClass == UsbConstants.USB_CLASS_PER_INTERFACE || usbClass == UsbConstants.USB_CLASS_MISC) && UsbDeviceHelper.findPrinterInterface(device) != null) {
                 usbClass = UsbConstants.USB_CLASS_PRINTER;
             }
-            if (usbClass == UsbConstants.USB_CLASS_PRINTER) {
+            boolean isMatchingExpectedDevice = StringUtils.isBlank(usbDeviceName)
+                    ||
+                    (device.getDeviceName() != null && device.getDeviceName().contains(usbDeviceName))
+                    ||
+                    (device.getDeviceName() != null && usbDeviceName.contains(device.getDeviceName()));
+            if (usbClass == UsbConstants.USB_CLASS_PRINTER && isMatchingExpectedDevice) {
                 usbPathAddress = device.getDeviceName();
                 break;
             }
@@ -286,7 +291,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private static void printLabelUsb(String payload, Promise promise, int labelWidth, int labelHeight, int labelGap, ReactApplicationContext context) {
+    private static void printLabelUsb(String payload, Promise promise, String usbDeviceName, int labelWidth, int labelHeight, int labelGap, ReactApplicationContext context) {
         if (StringUtils.isBlank(payload)) {
             promise.reject("-1", "Should provide valid pageLoad to print");
             return;
@@ -328,7 +333,12 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             if ((usbClass == UsbConstants.USB_CLASS_PER_INTERFACE || usbClass == UsbConstants.USB_CLASS_MISC) && UsbDeviceHelper.findPrinterInterface(device) != null) {
                 usbClass = UsbConstants.USB_CLASS_PRINTER;
             }
-            if (usbClass == UsbConstants.USB_CLASS_PRINTER) {
+            boolean isMatchingExpectedDevice = StringUtils.isBlank(usbDeviceName)
+                    ||
+                    (device.getDeviceName() != null && device.getDeviceName().contains(usbDeviceName))
+                    ||
+                    (device.getDeviceName() != null && usbDeviceName.contains(device.getDeviceName()));
+            if (usbClass == UsbConstants.USB_CLASS_PRINTER && isMatchingExpectedDevice) {
                 usbPathAddress = device.getDeviceName();
                 break;
             }

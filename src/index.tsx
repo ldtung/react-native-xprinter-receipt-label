@@ -42,12 +42,15 @@ type NativeModuleType = typeof NativeModules & {
     ): Promise<void>;
     printUsb80mm(
       payload: string,
+      usbDeviceName: string,
     ): Promise<void>;
     printUsb58mm(
       payload: string,
+      usbDeviceName: string,
     ): Promise<void>;
     printLabelUsb(
       payload: string,
+      usbDeviceNameL: string,
       labelWidth: number,
       labelHeight: number,
       labelGap: number,
@@ -62,6 +65,7 @@ const { RNXprinter }: NativeModuleType =
 
 interface PrinterInterface {
   payload: string;
+  usbDeviceName: string;
   labelWidth: number,
   labelHeight: number,
   labelGap: number,
@@ -81,6 +85,7 @@ let defaultConfig: PrintTcpInterface & PrintBluetoothInterface = {
   ip: '192.168.192.168',
   port: 9100,
   payload: '',
+  usbDeviceName: '',
   labelWidth: 50,
   labelHeight: 30,
   labelGap: 2
@@ -198,10 +203,12 @@ const printUsb80mm = (
 ): Promise<void> => {
   const {
     payload,
+    usbDeviceName,
   } = getConfig(args);
 
   return RNXprinter.printUsb80mm(
     payload,
+    usbDeviceName,
   );
 };
 
@@ -210,10 +217,12 @@ const printUsb58mm = (
 ): Promise<void> => {
   const {
     payload,
+    usbDeviceName,
   } = getConfig(args);
 
   return RNXprinter.printUsb58mm(
     payload,
+    usbDeviceName,
   );
 };
 
@@ -222,6 +231,7 @@ const printLabelUsb = (
 ): Promise<void> => {
   const {
     payload,
+    usbDeviceName,
     labelWidth,
     labelHeight,
     labelGap,
@@ -229,6 +239,7 @@ const printLabelUsb = (
 
   return RNXprinter.printLabelUsb(
     payload,
+    usbDeviceName,
     labelWidth,
     labelHeight,
     labelGap,
