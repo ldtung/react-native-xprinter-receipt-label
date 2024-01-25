@@ -19,6 +19,8 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.analy.receiptlabel.utils.StringUtils;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.module.annotations.ReactModule;
 import com.github.danielfelgar.drawreceiptlib.ReceiptBuilder;
 
@@ -144,6 +146,36 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     public void printLabelTcp(String ipAddress, int port, String payload, int labelWidth, int labelHeight, int labelGap, final Promise promise) {
         synchronized (lockEthernetLabelPrinting) {
             printLabelTcp(ipAddress, port, payload, promise, labelWidth, labelHeight, labelGap, this.context);
+        }
+    }
+
+    @ReactMethod
+    public void getUsbDeviceList(Promise promise) {
+        try {
+            UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+            if (usbManager == null) {
+                promise.reject("-1", "Can not connect to usb printer");
+                return;
+            }
+            Collection<UsbDevice> devicesList = usbManager.getDeviceList().values();
+            if (devicesList == null || devicesList.size() == 0) {
+                promise.reject("-1", "Can not connect to usb printer");
+                return;
+            }
+            WritableArray rnArray = new WritableNativeArray();
+            for (UsbDevice device : devicesList) {
+                int usbClass = device.getDeviceClass();
+                if ((usbClass == UsbConstants.USB_CLASS_PER_INTERFACE || usbClass == UsbConstants.USB_CLASS_MISC) && UsbDeviceHelper.findPrinterInterface(device) != null) {
+                    usbClass = UsbConstants.USB_CLASS_PRINTER;
+                }
+                if (usbClass == UsbConstants.USB_CLASS_PRINTER) {
+                    rnArray.pushString(device.getDeviceName());
+                    break;
+                }
+            }
+            promise.resolve(rnArray);
+        } catch (Exception e) {
+            promise.reject("USB Error", e.getMessage());
         }
     }
 

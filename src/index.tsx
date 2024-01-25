@@ -53,6 +53,7 @@ type NativeModuleType = typeof NativeModules & {
       labelGap: number,
     ): Promise<void>;
     getBluetoothDeviceList(): Promise<BluetoothPrinter[]>;
+    getUsbDeviceList(): Promise<string[]>;
   };
 };
 
@@ -238,6 +239,10 @@ const getBluetoothDeviceList = (): Promise<BluetoothPrinter[]> => {
   return RNXprinter.getBluetoothDeviceList();
 };
 
+const getUsbDeviceList = (): Promise<string[]> => {
+  return RNXprinter.getUsbDeviceList();
+};
+
 export default {
   printTcp80mm,
   printTcp58mm,
@@ -250,5 +255,6 @@ export default {
   printLabelUsb,
   defaultConfig,
   getBluetoothDeviceList,
+  getUsbDeviceList,
 };
 
