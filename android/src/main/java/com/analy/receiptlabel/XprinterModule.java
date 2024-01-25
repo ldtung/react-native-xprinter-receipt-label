@@ -170,7 +170,6 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 }
                 if (usbClass == UsbConstants.USB_CLASS_PRINTER) {
                     rnArray.pushString(device.getDeviceName());
-                    break;
                 }
             }
             promise.resolve(rnArray);
