@@ -169,7 +169,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     usbClass = UsbConstants.USB_CLASS_PRINTER;
                 }
                 if (usbClass == UsbConstants.USB_CLASS_PRINTER) {
-                    rnArray.pushString(device.getDeviceName());
+                    rnArray.pushString(getUsbPrinterName(device));
                 }
             }
             promise.resolve(rnArray);
@@ -266,11 +266,12 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             if ((usbClass == UsbConstants.USB_CLASS_PER_INTERFACE || usbClass == UsbConstants.USB_CLASS_MISC) && UsbDeviceHelper.findPrinterInterface(device) != null) {
                 usbClass = UsbConstants.USB_CLASS_PRINTER;
             }
+            String builtInPrinterName = getUsbPrinterName(device);
             boolean isMatchingExpectedDevice = StringUtils.isBlank(usbDeviceName)
                     ||
-                    (device.getDeviceName() != null && device.getDeviceName().contains(usbDeviceName))
+                    (builtInPrinterName.equalsIgnoreCase(usbDeviceName))
                     ||
-                    (device.getDeviceName() != null && usbDeviceName.contains(device.getDeviceName()));
+                    (usbDeviceName.equalsIgnoreCase(builtInPrinterName));
             if (usbClass == UsbConstants.USB_CLASS_PRINTER && isMatchingExpectedDevice) {
                 usbPathAddress = device.getDeviceName();
                 break;
@@ -332,11 +333,12 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             if ((usbClass == UsbConstants.USB_CLASS_PER_INTERFACE || usbClass == UsbConstants.USB_CLASS_MISC) && UsbDeviceHelper.findPrinterInterface(device) != null) {
                 usbClass = UsbConstants.USB_CLASS_PRINTER;
             }
+            String builtInPrinterName = getUsbPrinterName(device);
             boolean isMatchingExpectedDevice = StringUtils.isBlank(usbDeviceName)
                     ||
-                    (device.getDeviceName() != null && device.getDeviceName().contains(usbDeviceName))
+                    (builtInPrinterName.equalsIgnoreCase(usbDeviceName))
                     ||
-                    (device.getDeviceName() != null && usbDeviceName.contains(device.getDeviceName()));
+                    (usbDeviceName.equalsIgnoreCase(builtInPrinterName));
             if (usbClass == UsbConstants.USB_CLASS_PRINTER && isMatchingExpectedDevice) {
                 usbPathAddress = device.getDeviceName();
                 break;
@@ -354,6 +356,14 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 doPrintingLabelService(XprinterModule.curUsbConnectLabelPrinting, me, lines, labelWidth, labelHeight, labelGap, promise, true);
             }
         }
+    }
+
+    private static String getUsbPrinterName(UsbDevice device) {
+        if (device == null) {
+            return "";
+        }
+        String usbNameTmp = "USB:%s-%s";
+        return String.format(usbNameTmp, device.getVendorId(), device.getProductId());
     }
 
     private static void doUsbLabelPrintingAndRetry(IDeviceConnection curUsbConnectLabelPrinting, Promise promise, int labelWidth, int labelHeight, int labelGap, List<PrinterLine> lines,
