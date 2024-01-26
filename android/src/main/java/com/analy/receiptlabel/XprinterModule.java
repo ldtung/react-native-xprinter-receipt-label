@@ -362,8 +362,8 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         if (device == null) {
             return "";
         }
-        String usbNameTmp = "USB:%s-%s";
-        return String.format(usbNameTmp, device.getVendorId(), device.getProductId());
+        String usbNameTmp = "USB:%s-%s-%s";
+        return String.format(usbNameTmp, device.getVendorId(), device.getProductId(), device.getDeviceId());
     }
 
     private static void doUsbLabelPrintingAndRetry(IDeviceConnection curUsbConnectLabelPrinting, Promise promise, int labelWidth, int labelHeight, int labelGap, List<PrinterLine> lines,
