@@ -271,7 +271,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     ||
                     (builtInPrinterName.equalsIgnoreCase(usbDeviceName))
                     ||
-                    (usbDeviceName.equalsIgnoreCase(builtInPrinterName));
+                    (usbDeviceName.contains(builtInPrinterName));
             if (usbClass == UsbConstants.USB_CLASS_PRINTER && isMatchingExpectedDevice) {
                 usbPathAddress = device.getDeviceName();
                 break;
@@ -338,7 +338,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     ||
                     (builtInPrinterName.equalsIgnoreCase(usbDeviceName))
                     ||
-                    (usbDeviceName.equalsIgnoreCase(builtInPrinterName));
+                    (usbDeviceName.contains(builtInPrinterName));
             if (usbClass == UsbConstants.USB_CLASS_PRINTER && isMatchingExpectedDevice) {
                 usbPathAddress = device.getDeviceName();
                 break;
