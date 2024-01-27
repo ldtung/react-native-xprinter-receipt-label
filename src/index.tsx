@@ -24,6 +24,8 @@ type NativeModuleType = typeof NativeModules & {
       labelWidth: number,
       labelHeight: number,
       labelGap: number,
+      labelSpaceLeft: number,
+      labelSpaceTop: number,
     ): Promise<void>;
     printBluetooth80mm(
       macAddress: string,
@@ -39,6 +41,8 @@ type NativeModuleType = typeof NativeModules & {
       labelWidth: number,
       labelHeight: number,
       labelGap: number,
+      labelSpaceLeft: number,
+      labelSpaceTop: number,
     ): Promise<void>;
     printUsb80mm(
       payload: string,
@@ -54,6 +58,8 @@ type NativeModuleType = typeof NativeModules & {
       labelWidth: number,
       labelHeight: number,
       labelGap: number,
+      labelSpaceLeft: number,
+      labelSpaceTop: number,
     ): Promise<void>;
     getBluetoothDeviceList(): Promise<BluetoothPrinter[]>;
     getUsbDeviceList(): Promise<string[]>;
@@ -69,6 +75,8 @@ interface PrinterInterface {
   labelWidth: number,
   labelHeight: number,
   labelGap: number,
+  labelSpaceLeft: number,
+  labelSpaceTop: number,
 }
 
 interface PrintTcpInterface extends PrinterInterface {
@@ -88,7 +96,9 @@ let defaultConfig: PrintTcpInterface & PrintBluetoothInterface = {
   usbDeviceName: '',
   labelWidth: 50,
   labelHeight: 30,
-  labelGap: 2
+  labelGap: 2,
+  labelSpaceLeft: 0,
+  labelSpaceTop: 6,
 };
 
 const getConfig = (
@@ -138,6 +148,8 @@ const printLabelTcp = async (
     labelWidth,
     labelHeight,
     labelGap,
+    labelSpaceLeft,
+    labelSpaceTop,
   } = getConfig(args);
 
   await RNXprinter.printLabelTcp(
@@ -147,6 +159,8 @@ const printLabelTcp = async (
     labelWidth,
     labelHeight,
     labelGap,
+    labelSpaceLeft,
+    labelSpaceTop,
     );
   };
 
@@ -187,6 +201,8 @@ const printLabelBluetooth = (
     labelWidth,
     labelHeight,
     labelGap,
+    labelSpaceLeft,
+    labelSpaceTop,
   } = getConfig(args);
 
   return RNXprinter.printLabelBluetooth(
@@ -195,6 +211,8 @@ const printLabelBluetooth = (
     labelWidth,
     labelHeight,
     labelGap,
+    labelSpaceLeft,
+    labelSpaceTop,
   );
 };
 
@@ -235,6 +253,8 @@ const printLabelUsb = (
     labelWidth,
     labelHeight,
     labelGap,
+    labelSpaceLeft,
+    labelSpaceTop,
   } = getConfig(args);
 
   return RNXprinter.printLabelUsb(
@@ -243,6 +263,8 @@ const printLabelUsb = (
     labelWidth,
     labelHeight,
     labelGap,
+    labelSpaceLeft,
+    labelSpaceTop,
   );
 };
 
