@@ -142,7 +142,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 curEthernetConnect = null;
                 promise.resolve(true);
             } catch (Exception ex) {
-                promise.resolve(false);
+                promise.reject("-1", "Can not close the connection");
             }
         }
     }
@@ -155,7 +155,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 curBluetoothConnect = null;
                 promise.resolve(true);
             } catch (Exception ex) {
-                promise.resolve(false);
+                promise.reject("-1", "Can not close the connection");
             }
         }
     }
@@ -168,7 +168,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 curUsbConnect = null;
                 promise.resolve(true);
             } catch (Exception ex) {
-                promise.resolve(false);
+                promise.reject("-1", "Can not close the connection");
             }
         }
     }
@@ -181,7 +181,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 curEthernetConnectLabelPrinting = null;
                 promise.resolve(true);
             } catch (Exception ex) {
-                promise.resolve(false);
+                promise.reject("-1", "Can not close the connection");
             }
         }
     }
@@ -194,7 +194,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 curBluetoothConnectLabelPrinting = null;
                 promise.resolve(true);
             } catch (Exception ex) {
-                promise.resolve(false);
+                promise.reject("-1", "Can not close the connection");
             }
         }
     }
@@ -207,7 +207,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                 curUsbConnectLabelPrinting = null;
                 promise.resolve(true);
             } catch (Exception ex) {
-                promise.resolve(false);
+                promise.reject("-1", "Can not close the connection");
             }
         }
     }
