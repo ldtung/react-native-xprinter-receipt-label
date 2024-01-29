@@ -839,6 +839,23 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } catch (Exception ex) {
             // Error while printing
             promise.reject("-1", "There is an error while printing " + ex.getMessage());
+        } finally {
+            if (deviceConnection != null) {
+                try {
+                    if (deviceConnection == curEthernetConnectLabelPrinting) {
+                        curEthernetConnectLabelPrinting.close();
+                        curEthernetConnectLabelPrinting = null;
+                    } else if (deviceConnection ==  curBluetoothConnectLabelPrinting ) {
+                        curBluetoothConnectLabelPrinting.close();
+                        curBluetoothConnectLabelPrinting = null;
+                    } else if (deviceConnection ==  curUsbConnectLabelPrinting ) {
+                        curUsbConnectLabelPrinting.close();
+                        curUsbConnectLabelPrinting = null;
+                    }
+                } catch (Exception ex) {
+                    // donothing
+                }
+            }
         }
     }
 
@@ -895,6 +912,23 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } catch (Exception ex) {
             // Error while printing
             promise.reject("-1", "There is an error while printing " + ex.getMessage());
+        } finally {
+            if (deviceConnection != null) {
+                try {
+                    if (deviceConnection == curEthernetConnect) {
+                        curEthernetConnect.close();
+                        curEthernetConnect = null;
+                    } else if (deviceConnection ==  curBluetoothConnect ) {
+                        curBluetoothConnect.close();
+                        curBluetoothConnect = null;
+                    } else if (deviceConnection ==  curUsbConnect ) {
+                        curUsbConnect.close();
+                        curUsbConnect = null;
+                    }
+                } catch (Exception ex) {
+                    // do nothing
+                }
+            }
         }
     }
 
