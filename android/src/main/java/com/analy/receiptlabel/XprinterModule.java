@@ -136,78 +136,90 @@ public class XprinterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void closeTcpConnection(final Promise promise) {
-        if (curEthernetConnect != null) {
-            try {
-                curEthernetConnect.close();
-                curEthernetConnect = null;
-                promise.resolve(true);
-            } catch (Exception ex) {
-                promise.reject("-1", "Can not close the connection");
+        synchronized (lockEthernet) {
+            if (curEthernetConnect != null) {
+                try {
+                    curEthernetConnect.close();
+                    curEthernetConnect = null;
+                    promise.resolve(true);
+                } catch (Exception ex) {
+                    promise.reject("-1", "Can not close the connection");
+                }
             }
         }
     }
 
     @ReactMethod
     public void closeBluetoohConnection(final Promise promise) {
-        if (curBluetoothConnect != null) {
-            try {
-                curBluetoothConnect.close();
-                curBluetoothConnect = null;
-                promise.resolve(true);
-            } catch (Exception ex) {
-                promise.reject("-1", "Can not close the connection");
+        synchronized (lockBluetooth) {
+            if (curBluetoothConnect != null) {
+                try {
+                    curBluetoothConnect.close();
+                    curBluetoothConnect = null;
+                    promise.resolve(true);
+                } catch (Exception ex) {
+                    promise.reject("-1", "Can not close the connection");
+                }
             }
         }
     }
 
     @ReactMethod
     public void closeUsbConnection(final Promise promise) {
-        if (curUsbConnect != null) {
-            try {
-                curUsbConnect.close();
-                curUsbConnect = null;
-                promise.resolve(true);
-            } catch (Exception ex) {
-                promise.reject("-1", "Can not close the connection");
+        synchronized (lockUsb) {
+            if (curUsbConnect != null) {
+                try {
+                    curUsbConnect.close();
+                    curUsbConnect = null;
+                    promise.resolve(true);
+                } catch (Exception ex) {
+                    promise.reject("-1", "Can not close the connection");
+                }
             }
         }
     }
 
     @ReactMethod
     public void closeTcpLabelConnection(final Promise promise) {
-        if (curEthernetConnectLabelPrinting != null) {
-            try {
-                curEthernetConnectLabelPrinting.close();
-                curEthernetConnectLabelPrinting = null;
-                promise.resolve(true);
-            } catch (Exception ex) {
-                promise.reject("-1", "Can not close the connection");
+        synchronized (lockEthernetLabelPrinting) {
+            if (curEthernetConnectLabelPrinting != null) {
+                try {
+                    curEthernetConnectLabelPrinting.close();
+                    curEthernetConnectLabelPrinting = null;
+                    promise.resolve(true);
+                } catch (Exception ex) {
+                    promise.reject("-1", "Can not close the connection");
+                }
             }
         }
     }
 
     @ReactMethod
     public void closeBluetoohLabelConnection(final Promise promise) {
-        if (curBluetoothConnectLabelPrinting != null) {
-            try {
-                curBluetoothConnectLabelPrinting.close();
-                curBluetoothConnectLabelPrinting = null;
-                promise.resolve(true);
-            } catch (Exception ex) {
-                promise.reject("-1", "Can not close the connection");
+        synchronized (lockBluetoothLabelPrinting) {
+            if (curBluetoothConnectLabelPrinting != null) {
+                try {
+                    curBluetoothConnectLabelPrinting.close();
+                    curBluetoothConnectLabelPrinting = null;
+                    promise.resolve(true);
+                } catch (Exception ex) {
+                    promise.reject("-1", "Can not close the connection");
+                }
             }
         }
     }
 
     @ReactMethod
     public void closeUsbLabelConnection(final Promise promise) {
-        if (curUsbConnectLabelPrinting != null) {
-            try {
-                curUsbConnectLabelPrinting.close();
-                curUsbConnectLabelPrinting = null;
-                promise.resolve(true);
-            } catch (Exception ex) {
-                promise.reject("-1", "Can not close the connection");
+        synchronized (lockUsbLabelPrinting) {
+            if (curUsbConnectLabelPrinting != null) {
+                try {
+                    curUsbConnectLabelPrinting.close();
+                    curUsbConnectLabelPrinting = null;
+                    promise.resolve(true);
+                } catch (Exception ex) {
+                    promise.reject("-1", "Can not close the connection");
+                }
             }
         }
     }
