@@ -63,6 +63,12 @@ type NativeModuleType = typeof NativeModules & {
     ): Promise<void>;
     getBluetoothDeviceList(): Promise<BluetoothPrinter[]>;
     getUsbDeviceList(): Promise<string[]>;
+    closeTcpConnection: Promise<boolean>,
+    closeBluetoohConnection: Promise<boolean>,
+    closeUsbConnection: Promise<boolean>,
+    closeTcpLabelConnection: Promise<boolean>,
+    closeBluetoohLabelConnection: Promise<boolean>,
+    closeUsbLabelConnection: Promise<boolean>,
   };
 };
 
@@ -276,6 +282,30 @@ const getUsbDeviceList = (): Promise<string[]> => {
   return RNXprinter.getUsbDeviceList();
 };
 
+const closeTcpConnection = (): Promise<boolean> => {
+  return RNXprinter.closeTcpConnection();
+};
+
+const closeBluetoohConnection = (): Promise<boolean> => {
+  return RNXprinter.closeBluetoohConnection();
+};
+
+const closeUsbConnection = (): Promise<boolean> => {
+  return RNXprinter.closeUsbConnection();
+};
+
+const closeTcpLabelConnection = (): Promise<boolean> => {
+  return RNXprinter.closeTcpLabelConnection();
+};
+
+const closeBluetoohLabelConnection = (): Promise<boolean> => {
+  return RNXprinter.closeBluetoohLabelConnection();
+};
+
+const closeUsbLabelConnection = (): Promise<boolean> => {
+  return RNXprinter.closeUsbLabelConnection();
+};
+
 export default {
   printTcp80mm,
   printTcp58mm,
@@ -289,5 +319,11 @@ export default {
   defaultConfig,
   getBluetoothDeviceList,
   getUsbDeviceList,
+  closeTcpConnection,
+  closeBluetoohConnection,
+  closeUsbConnection,
+  closeTcpLabelConnection,
+  closeBluetoohLabelConnection,
+  closeUsbLabelConnection,
 };
 

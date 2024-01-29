@@ -135,6 +135,84 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void closeTcpConnection(final Promise promise) {
+        if (curEthernetConnect != null) {
+            try {
+                curEthernetConnect.close();
+                curEthernetConnect = null;
+                promise.resolve(true);
+            } catch (Exception ex) {
+                promise.resolve(false);
+            }
+        }
+    }
+
+    @ReactMethod
+    public void closeBluetoohConnection(final Promise promise) {
+        if (curBluetoothConnect != null) {
+            try {
+                curBluetoothConnect.close();
+                curBluetoothConnect = null;
+                promise.resolve(true);
+            } catch (Exception ex) {
+                promise.resolve(false);
+            }
+        }
+    }
+
+    @ReactMethod
+    public void closeUsbConnection(final Promise promise) {
+        if (curUsbConnect != null) {
+            try {
+                curUsbConnect.close();
+                curUsbConnect = null;
+                promise.resolve(true);
+            } catch (Exception ex) {
+                promise.resolve(false);
+            }
+        }
+    }
+
+    @ReactMethod
+    public void closeTcpLabelConnection(final Promise promise) {
+        if (curEthernetConnectLabelPrinting != null) {
+            try {
+                curEthernetConnectLabelPrinting.close();
+                curEthernetConnectLabelPrinting = null;
+                promise.resolve(true);
+            } catch (Exception ex) {
+                promise.resolve(false);
+            }
+        }
+    }
+
+    @ReactMethod
+    public void closeBluetoohLabelConnection(final Promise promise) {
+        if (curBluetoothConnectLabelPrinting != null) {
+            try {
+                curBluetoothConnectLabelPrinting.close();
+                curBluetoothConnectLabelPrinting = null;
+                promise.resolve(true);
+            } catch (Exception ex) {
+                promise.resolve(false);
+            }
+        }
+    }
+
+    @ReactMethod
+    public void closeUsbLabelConnection(final Promise promise) {
+        if (curUsbConnectLabelPrinting != null) {
+            try {
+                curUsbConnectLabelPrinting.close();
+                curUsbConnectLabelPrinting = null;
+                promise.resolve(true);
+            } catch (Exception ex) {
+                promise.resolve(false);
+            }
+        }
+    }
+
+    @ReactMethod
     public void printTcp58mm(String ipAddress, int port, String payload, final Promise promise) {
         synchronized (lockEthernet) {
             int receiptWidth = PRINTER_58mm_WIDTH;
@@ -306,7 +384,6 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             try {
                 if (XprinterModule.curUsbConnectLabelPrinting != null) {
                     XprinterModule.curUsbConnectLabelPrinting.close();
-                    Thread.sleep(200);
                 }
             } catch (Exception ex) {
 
@@ -490,7 +567,6 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             try {
                 if (XprinterModule.curBluetoothConnectLabelPrinting != null) {
                     XprinterModule.curBluetoothConnectLabelPrinting.close();
-                    Thread.sleep(200);
                 }
             } catch (Exception ex) {
 
