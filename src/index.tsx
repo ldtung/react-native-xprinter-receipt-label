@@ -63,12 +63,12 @@ type NativeModuleType = typeof NativeModules & {
     ): Promise<void>;
     getBluetoothDeviceList(): Promise<BluetoothPrinter[]>;
     getUsbDeviceList(): Promise<string[]>;
-    closeTcpConnection: Promise<boolean>;
-    closeBluetoohConnection: Promise<boolean>;
-    closeUsbConnection: Promise<boolean>;
-    closeTcpLabelConnection: Promise<boolean>;
-    closeBluetoohLabelConnection: Promise<boolean>;
-    closeUsbLabelConnection: Promise<boolean>;
+    closeTcpConnection(): Promise<boolean>;
+    closeBluetoohConnection(): Promise<boolean>;
+    closeUsbConnection(): Promise<boolean>;
+    closeTcpLabelConnection(): Promise<boolean>;
+    closeBluetoohLabelConnection(): Promise<boolean>;
+    closeUsbLabelConnection(): Promise<boolean>;
   };
 };
 
