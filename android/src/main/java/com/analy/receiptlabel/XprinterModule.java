@@ -142,10 +142,16 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     curEthernetConnect.close();
                     curEthernetConnect = null;
                     promise.resolve(true);
+                    return;
                 } catch (Exception ex) {
                     promise.reject("-1", "Can not close the connection");
+                    return;
+                } finally {
+                    curEthernetConnect = null;
                 }
             }
+            promise.resolve(true);
+            return;
         }
     }
 
@@ -157,10 +163,16 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     curBluetoothConnect.close();
                     curBluetoothConnect = null;
                     promise.resolve(true);
+                    return;
                 } catch (Exception ex) {
                     promise.reject("-1", "Can not close the connection");
+                    return;
+                } finally {
+                    curBluetoothConnect = null;
                 }
             }
+            promise.resolve(true);
+            return;
         }
     }
 
@@ -172,10 +184,16 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     curUsbConnect.close();
                     curUsbConnect = null;
                     promise.resolve(true);
+                    return;
                 } catch (Exception ex) {
                     promise.reject("-1", "Can not close the connection");
+                    return;
+                } finally {
+                    curUsbConnect = null;
                 }
             }
+            promise.resolve(true);
+            return;
         }
     }
 
@@ -187,10 +205,16 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     curEthernetConnectLabelPrinting.close();
                     curEthernetConnectLabelPrinting = null;
                     promise.resolve(true);
+                    return;
                 } catch (Exception ex) {
                     promise.reject("-1", "Can not close the connection");
+                    return;
+                } finally {
+                    curEthernetConnectLabelPrinting = null;
                 }
             }
+            promise.resolve(true);
+            return;
         }
     }
 
@@ -202,10 +226,16 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     curBluetoothConnectLabelPrinting.close();
                     curBluetoothConnectLabelPrinting = null;
                     promise.resolve(true);
+                    return;
                 } catch (Exception ex) {
                     promise.reject("-1", "Can not close the connection");
+                    return;
+                } finally {
+                    curBluetoothConnectLabelPrinting = null;
                 }
             }
+            promise.resolve(true);
+            return;
         }
     }
 
@@ -217,10 +247,16 @@ public class XprinterModule extends ReactContextBaseJavaModule {
                     curUsbConnectLabelPrinting.close();
                     curUsbConnectLabelPrinting = null;
                     promise.resolve(true);
+                    return;
                 } catch (Exception ex) {
                     promise.reject("-1", "Can not close the connection");
+                    return;
+                } finally {
+                    curUsbConnectLabelPrinting = null;
                 }
             }
+            promise.resolve(true);
+            return;
         }
     }
 
