@@ -75,6 +75,9 @@ type NativeModuleType = typeof NativeModules & {
 const { RNXprinter }: NativeModuleType =
   NativeModules as NativeModuleType;
 
+const { RNXprinterLabel }: NativeModuleType =
+  NativeModules as NativeModuleType;
+
 interface PrinterInterface {
   payload: string;
   usbDeviceName: string;
@@ -158,7 +161,7 @@ const printLabelTcp = async (
     labelSpaceTop,
   } = getConfig(args);
 
-  await RNXprinter.printLabelTcp(
+  await RNXprinterLabel.printLabelTcp(
     ip,
     port,
     payload,
@@ -211,7 +214,7 @@ const printLabelBluetooth = (
     labelSpaceTop,
   } = getConfig(args);
 
-  return RNXprinter.printLabelBluetooth(
+  return RNXprinterLabel.printLabelBluetooth(
     macAddress,
     payload,
     labelWidth,
@@ -263,7 +266,7 @@ const printLabelUsb = (
     labelSpaceTop,
   } = getConfig(args);
 
-  return RNXprinter.printLabelUsb(
+  return RNXprinterLabel.printLabelUsb(
     payload,
     usbDeviceName,
     labelWidth,
@@ -295,15 +298,15 @@ const closeUsbConnection = (): Promise<boolean> => {
 };
 
 const closeTcpLabelConnection = (): Promise<boolean> => {
-  return RNXprinter.closeTcpLabelConnection();
+  return RNXprinterLabel.closeTcpLabelConnection();
 };
 
 const closeBluetoohLabelConnection = (): Promise<boolean> => {
-  return RNXprinter.closeBluetoohLabelConnection();
+  return RNXprinterLabel.closeBluetoohLabelConnection();
 };
 
 const closeUsbLabelConnection = (): Promise<boolean> => {
-  return RNXprinter.closeUsbLabelConnection();
+  return RNXprinterLabel.closeUsbLabelConnection();
 };
 
 export default {
