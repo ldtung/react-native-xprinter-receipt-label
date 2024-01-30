@@ -39,46 +39,9 @@ type NativeModuleType = typeof NativeModules & {
     closeBluetoohConnection(): Promise<boolean>;
     closeUsbConnection(): Promise<boolean>;
   };
-
-  RNXprinterLabel: {
-    printLabelTcp(
-      ip: string,
-      port: number,
-      payload: string,
-      labelWidth: number,
-      labelHeight: number,
-      labelGap: number,
-      labelSpaceLeft: number,
-      labelSpaceTop: number,
-    ): Promise<void>;
-    printLabelBluetooth(
-      macAddress: string,
-      payload: string,
-      labelWidth: number,
-      labelHeight: number,
-      labelGap: number,
-      labelSpaceLeft: number,
-      labelSpaceTop: number,
-    ): Promise<void>;
-    printLabelUsb(
-      payload: string,
-      usbDeviceNameL: string,
-      labelWidth: number,
-      labelHeight: number,
-      labelGap: number,
-      labelSpaceLeft: number,
-      labelSpaceTop: number,
-    ): Promise<void>;
-    closeTcpLabelConnection(): Promise<boolean>;
-    closeBluetoohLabelConnection(): Promise<boolean>;
-    closeUsbLabelConnection(): Promise<boolean>;
-  };
 };
 
 const { RNXprinter }: NativeModuleType =
-  NativeModules as NativeModuleType;
-
-const { RNXprinterLabel }: NativeModuleType =
   NativeModules as NativeModuleType;
 
 interface PrinterInterface {
@@ -150,32 +113,7 @@ const printTcp58mm = async (
     payload,
     );
   };
-const printLabelTcp = async (
-  args: Partial<PrintTcpInterface> & Pick<PrinterInterface, 'payload'>
-): Promise<void> => {
-  const {
-    ip,
-    port,
-    payload,
-    labelWidth,
-    labelHeight,
-    labelGap,
-    labelSpaceLeft,
-    labelSpaceTop,
-  } = getConfig(args);
-
-  await RNXprinterLabel.printLabelTcp(
-    ip,
-    port,
-    payload,
-    labelWidth,
-    labelHeight,
-    labelGap,
-    labelSpaceLeft,
-    labelSpaceTop,
-    );
-  };
-
+  
 const printBluetooth80mm = (
   args: Partial<PrintBluetoothInterface> & Pick<PrinterInterface, 'payload'>
 ): Promise<void> => {
@@ -201,30 +139,6 @@ const printBluetooth58mm = (
   return RNXprinter.printBluetooth58mm(
     macAddress,
     payload,
-  );
-};
-
-const printLabelBluetooth = (
-  args: Partial<PrintBluetoothInterface> & Pick<PrinterInterface, 'payload'>
-): Promise<void> => {
-  const {
-    macAddress,
-    payload,
-    labelWidth,
-    labelHeight,
-    labelGap,
-    labelSpaceLeft,
-    labelSpaceTop,
-  } = getConfig(args);
-
-  return RNXprinterLabel.printLabelBluetooth(
-    macAddress,
-    payload,
-    labelWidth,
-    labelHeight,
-    labelGap,
-    labelSpaceLeft,
-    labelSpaceTop,
   );
 };
 
@@ -256,30 +170,6 @@ const printUsb58mm = (
   );
 };
 
-const printLabelUsb = (
-  args: Partial<PrintBluetoothInterface> & Pick<PrinterInterface, 'payload'>
-): Promise<void> => {
-  const {
-    payload,
-    usbDeviceName,
-    labelWidth,
-    labelHeight,
-    labelGap,
-    labelSpaceLeft,
-    labelSpaceTop,
-  } = getConfig(args);
-
-  return RNXprinterLabel.printLabelUsb(
-    payload,
-    usbDeviceName,
-    labelWidth,
-    labelHeight,
-    labelGap,
-    labelSpaceLeft,
-    labelSpaceTop,
-  );
-};
-
 const getBluetoothDeviceList = (): Promise<BluetoothPrinter[]> => {
   return RNXprinter.getBluetoothDeviceList();
 };
@@ -300,18 +190,6 @@ const closeUsbConnection = (): Promise<boolean> => {
   return RNXprinter.closeUsbConnection();
 };
 
-const closeTcpLabelConnection = (): Promise<boolean> => {
-  return RNXprinterLabel.closeTcpLabelConnection();
-};
-
-const closeBluetoohLabelConnection = (): Promise<boolean> => {
-  return RNXprinterLabel.closeBluetoohLabelConnection();
-};
-
-const closeUsbLabelConnection = (): Promise<boolean> => {
-  return RNXprinterLabel.closeUsbLabelConnection();
-};
-
 export default {
   printTcp80mm,
   printTcp58mm,
@@ -319,17 +197,11 @@ export default {
   printBluetooth58mm,
   printUsb80mm,
   printUsb58mm,
-  printLabelTcp,
-  printLabelBluetooth,
-  printLabelUsb,
   defaultConfig,
   getBluetoothDeviceList,
   getUsbDeviceList,
   closeTcpConnection,
   closeBluetoohConnection,
   closeUsbConnection,
-  closeTcpLabelConnection,
-  closeBluetoohLabelConnection,
-  closeUsbLabelConnection,
 };
 

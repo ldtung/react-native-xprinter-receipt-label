@@ -17,7 +17,6 @@ public class XprinterPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new XprinterModule(reactContext));
-        modules.add(new XprinterLabelModule(reactContext));
         return modules;
     }
 
