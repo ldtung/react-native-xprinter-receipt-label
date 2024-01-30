@@ -17,6 +17,30 @@ type NativeModuleType = typeof NativeModules & {
       port: number,
       payload: string,
     ): Promise<void>;
+    printBluetooth80mm(
+      macAddress: string,
+      payload: string,
+    ): Promise<void>;
+    printBluetooth58mm(
+      macAddress: string,
+      payload: string,
+    ): Promise<void>;
+    printUsb80mm(
+      payload: string,
+      usbDeviceName: string,
+    ): Promise<void>;
+    printUsb58mm(
+      payload: string,
+      usbDeviceName: string,
+    ): Promise<void>;
+    getBluetoothDeviceList(): Promise<BluetoothPrinter[]>;
+    getUsbDeviceList(): Promise<string[]>;
+    closeTcpConnection(): Promise<boolean>;
+    closeBluetoohConnection(): Promise<boolean>;
+    closeUsbConnection(): Promise<boolean>;
+  };
+
+  RNXprinterLabel: {
     printLabelTcp(
       ip: string,
       port: number,
@@ -27,14 +51,6 @@ type NativeModuleType = typeof NativeModules & {
       labelSpaceLeft: number,
       labelSpaceTop: number,
     ): Promise<void>;
-    printBluetooth80mm(
-      macAddress: string,
-      payload: string,
-    ): Promise<void>;
-    printBluetooth58mm(
-      macAddress: string,
-      payload: string,
-    ): Promise<void>;
     printLabelBluetooth(
       macAddress: string,
       payload: string,
@@ -43,14 +59,6 @@ type NativeModuleType = typeof NativeModules & {
       labelGap: number,
       labelSpaceLeft: number,
       labelSpaceTop: number,
-    ): Promise<void>;
-    printUsb80mm(
-      payload: string,
-      usbDeviceName: string,
-    ): Promise<void>;
-    printUsb58mm(
-      payload: string,
-      usbDeviceName: string,
     ): Promise<void>;
     printLabelUsb(
       payload: string,
@@ -61,11 +69,6 @@ type NativeModuleType = typeof NativeModules & {
       labelSpaceLeft: number,
       labelSpaceTop: number,
     ): Promise<void>;
-    getBluetoothDeviceList(): Promise<BluetoothPrinter[]>;
-    getUsbDeviceList(): Promise<string[]>;
-    closeTcpConnection(): Promise<boolean>;
-    closeBluetoohConnection(): Promise<boolean>;
-    closeUsbConnection(): Promise<boolean>;
     closeTcpLabelConnection(): Promise<boolean>;
     closeBluetoohLabelConnection(): Promise<boolean>;
     closeUsbLabelConnection(): Promise<boolean>;
