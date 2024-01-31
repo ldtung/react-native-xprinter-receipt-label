@@ -14,6 +14,7 @@ import android.graphics.Paint;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.analy.receiptlabel.utils.ConnectionCheck;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -33,6 +34,7 @@ import net.posprinter.TSCConst;
 import net.posprinter.TSCPrinter;
 import net.posprinter.ZPLPrinter;
 import net.posprinter.posprinterface.IMyBinder;
+import net.posprinter.posprinterface.IStatusCallback;
 import net.posprinter.service.PosprinterService;
 
 import android.hardware.usb.UsbConstants;
@@ -282,6 +284,14 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             usbLastConnectTime = ethernetPrintingTimeNow;
         }
 
+        if (!needToReconnect) {
+            ConnectionCheck status = checkConnectionToPrinter(XprinterModule.curUsbConnect);
+            if (!status.isConnected()) {
+                needToReconnect = true;
+                usbLastConnectTime = new Date();
+            }
+        }
+
         String usbPathAddress = "";
         UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         if (usbManager == null) {
@@ -332,6 +342,38 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         String deviceId = String.valueOf(device.getDeviceId());
         return String.format(usbNameTmp, device.getVendorId(), device.getProductId(), deviceId.substring(0, 1));
     }
+
+    private static ConnectionCheck checkConnectionToPrinter(IDeviceConnection printerConnection) {
+        ConnectionCheck status = new ConnectionCheck();
+        printerConnection.isConnect(new byte[10], new IStatusCallback() {
+            @Override
+            public void receive(int i) {
+                status.setConnected(i == 1);
+                status.setStatusReceived(true);
+            }
+        });
+        long startTime = System.currentTimeMillis();
+        long timeout = 2500;
+
+        while (!status.isStatusReceived()) {
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();  // Preserve the interrupted status
+                e.printStackTrace();  // Consider logging the exception
+            }
+
+            // Check for timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                status.setTimeOut(true);
+                break;
+            }
+        }
+
+        return status;
+    }
+
+
 
     private static void doUsbPrintingAndRetry(IDeviceConnection curUsbConnect, Promise promise, int receiptWidth, List<PrinterLine> lines,
                                               ReactApplicationContext me, String usbPathAddress, boolean retryIfFailed) {
@@ -391,6 +433,14 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             needToReconnect = true;
 
             bluetoothLastConnectTime = ethernetPrintingTimeNow;
+        }
+
+        if (!needToReconnect) {
+            ConnectionCheck status = checkConnectionToPrinter(XprinterModule.curBluetoothConnect);
+            if (!status.isConnected()) {
+                needToReconnect = true;
+                bluetoothLastConnectTime = new Date();
+            }
         }
 
         if (needToReconnect) {
@@ -458,6 +508,14 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             XprinterModule.curEthernetConnect = POSConnect.createDevice(POSConnect.DEVICE_TYPE_ETHERNET);
             needToReconnect = true;
             ethernetLastConnectTime = ethernetPrintingTimeNow;
+        }
+
+        if (!needToReconnect) {
+            ConnectionCheck status = checkConnectionToPrinter(XprinterModule.curEthernetConnect);
+            if (!status.isConnected()) {
+                needToReconnect = true;
+                ethernetLastConnectTime = new Date();
+            }
         }
 
         if (needToReconnect) {
