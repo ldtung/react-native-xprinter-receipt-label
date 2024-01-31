@@ -11,27 +11,33 @@ type NativeModuleType = typeof NativeModules & {
       ip: string,
       port: number,
       payload: string,
+      closeAfterPrinted: boolean,
     ): Promise<void>;
     printTcp58mm(
       ip: string,
       port: number,
       payload: string,
+      closeAfterPrinted: boolean,
     ): Promise<void>;
     printBluetooth80mm(
       macAddress: string,
       payload: string,
+      closeAfterPrinted: boolean,
     ): Promise<void>;
     printBluetooth58mm(
       macAddress: string,
       payload: string,
+      closeAfterPrinted: boolean,
     ): Promise<void>;
     printUsb80mm(
       payload: string,
       usbDeviceName: string,
+      closeAfterPrinted: boolean,
     ): Promise<void>;
     printUsb58mm(
       payload: string,
       usbDeviceName: string,
+      closeAfterPrinted: boolean,
     ): Promise<void>;
     getBluetoothDeviceList(): Promise<BluetoothPrinter[]>;
     getUsbDeviceList(): Promise<string[]>;
@@ -52,6 +58,7 @@ interface PrinterInterface {
   labelGap: number,
   labelSpaceLeft: number,
   labelSpaceTop: number,
+  closeAfterPrinted: boolean,
 }
 
 interface PrintTcpInterface extends PrinterInterface {
@@ -74,6 +81,7 @@ let defaultConfig: PrintTcpInterface & PrintBluetoothInterface = {
   labelGap: 2,
   labelSpaceLeft: 0,
   labelSpaceTop: 6,
+  closeAfterPrinted: true,
 };
 
 const getConfig = (
@@ -89,12 +97,14 @@ const printTcp80mm = async (
     ip,
     port,
     payload,
+    closeAfterPrinted,
   } = getConfig(args);
 
   await RNXprinter.printTcp80mm(
     ip,
     port,
     payload,
+    closeAfterPrinted,
     );
   };
 
@@ -105,26 +115,30 @@ const printTcp58mm = async (
     ip,
     port,
     payload,
+    closeAfterPrinted,
   } = getConfig(args);
 
   await RNXprinter.printTcp58mm(
     ip,
     port,
     payload,
+    closeAfterPrinted,
     );
   };
-  
+
 const printBluetooth80mm = (
   args: Partial<PrintBluetoothInterface> & Pick<PrinterInterface, 'payload'>
 ): Promise<void> => {
   const {
     macAddress,
     payload,
+    closeAfterPrinted,
   } = getConfig(args);
 
   return RNXprinter.printBluetooth80mm(
     macAddress,
     payload,
+    closeAfterPrinted,
   );
 };
 
@@ -134,11 +148,13 @@ const printBluetooth58mm = (
   const {
     macAddress,
     payload,
+    closeAfterPrinted,
   } = getConfig(args);
 
   return RNXprinter.printBluetooth58mm(
     macAddress,
     payload,
+    closeAfterPrinted,
   );
 };
 
@@ -148,11 +164,13 @@ const printUsb80mm = (
   const {
     payload,
     usbDeviceName,
+    closeAfterPrinted,
   } = getConfig(args);
 
   return RNXprinter.printUsb80mm(
     payload,
     usbDeviceName,
+    closeAfterPrinted,
   );
 };
 
@@ -162,11 +180,13 @@ const printUsb58mm = (
   const {
     payload,
     usbDeviceName,
+    closeAfterPrinted,
   } = getConfig(args);
 
   return RNXprinter.printUsb58mm(
     payload,
     usbDeviceName,
+    closeAfterPrinted,
   );
 };
 
