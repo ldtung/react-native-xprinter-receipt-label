@@ -74,7 +74,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
     private static Date ethernetLastConnectTime = null;
     private static Date bluetoothLastConnectTime = null;
     private static Date usbLastConnectTime = null;
-    private static Long differentSecondsToReconnect = 15l;
+    private static Long differentSecondsToReconnect = 9l;
     private static IDeviceConnection curBluetoothConnect = null;
     private static IDeviceConnection curUsbConnect = null;
 
