@@ -611,6 +611,29 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         } catch (Exception ex) {
             // Error while printing
             promise.reject("-1", "There is an error while printing " + ex.getMessage());
+        } finally {
+            try {
+                // Wait for 3 seconds (3000 milliseconds)
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (deviceConnection != null) {
+                try {
+                    if (deviceConnection == curEthernetConnect) {
+                        curEthernetConnect.close();
+                        curEthernetConnect = null;
+                    } else if (deviceConnection == curBluetoothConnect) {
+                        curBluetoothConnect.close();
+                        curBluetoothConnect = null;
+                    } else if (deviceConnection == curUsbConnect) {
+                        curUsbConnect.close();
+                        curUsbConnect = null;
+                    }
+                } catch (Exception ex) {
+                    // do nothing
+                }
+            }
         }
     }
 
