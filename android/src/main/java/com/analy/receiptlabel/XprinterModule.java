@@ -324,7 +324,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
             return;
         }
         if (needToReconnect) {
-            doUsbPrintingAndRetry(XprinterModule.curUsbConnect, promise, receiptWidth, lines, me, usbPathAddress, true, closeAfterPrinted);
+            doUsbPrintingAndRetry(XprinterModule.curUsbConnect, promise, receiptWidth, lines, me, usbPathAddress, false, closeAfterPrinted);
         } else {
             // Trigger print now.
             synchronized (lockPrintingAsync) {
@@ -445,7 +445,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
 
         if (needToReconnect) {
-            doBluetoothPrintingAndRetry(XprinterModule.curBluetoothConnect, macAddress, promise, receiptWidth, lines, me, true, closeAfterPrinted);
+            doBluetoothPrintingAndRetry(XprinterModule.curBluetoothConnect, macAddress, promise, receiptWidth, lines, me, false, closeAfterPrinted);
         } else {
             // Trigger print now.
             synchronized (lockPrintingAsync) {
@@ -521,7 +521,7 @@ public class XprinterModule extends ReactContextBaseJavaModule {
         }
 
         if (needToReconnect) {
-            doTcpPrintingAndRetry(curEthernetConnect, ipAddress, promise, receiptWidth, lines, me, true, closeAfterPrinted);
+            doTcpPrintingAndRetry(curEthernetConnect, ipAddress, promise, receiptWidth, lines, me, false, closeAfterPrinted);
         } else {
             // Trigger print now.
             synchronized (lockPrintingAsync) {
